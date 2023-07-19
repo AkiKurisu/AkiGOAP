@@ -1,0 +1,18 @@
+{
+    "name": "Kurisu.GOAP.Editor",
+    "rootNamespace": "Kurisu.GOAP.Editor",
+    "references": [
+        "GUID:41ce47af1d69c28458bf06fdc18c263d"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

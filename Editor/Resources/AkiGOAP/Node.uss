@@ -1,0 +1,29 @@
+#title-label
+{
+    color:black;
+    font-size: 15px;
+}
+.unity-base-field__label
+{
+    min-width:20px;
+}
+.unity-base-field
+{
+    flex-basis:auto;
+    min-width:80px;
+}
+#unity-text-input
+{
+    min-width:50px;
+}
+GOAPActionNode #title {
+    background-color: rgba(251, 114, 153, 0.91);
+}
+GOAPGoalNode #title {
+    background-color: rgba(0, 255, 255, 0.91);
+
+}
+Foldout:hover
+{
+   background-color: rgba(77, 77, 77, 0.91);
+}

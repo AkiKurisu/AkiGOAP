@@ -1,0 +1,16 @@
+{
+    "name": "Kurisu.GOAP.Example",
+    "rootNamespace": "Kurisu.GOAP.Example",
+    "references": [
+        "GUID:41ce47af1d69c28458bf06fdc18c263d"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

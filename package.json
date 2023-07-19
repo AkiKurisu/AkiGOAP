@@ -1,0 +1,22 @@
+{
+  "name": "com.kurisu.akigoap",
+  "displayName": "AkiGOAP",
+  "version": "1.0.0",
+  "unity": "2021.3",
+  "description": "Modular and high-performed Goal Oriental Action Planner with well designed visual graph editor.",
+  "keywords": [
+    "Graph",
+    "GraphView",
+    "GOAP",
+    "AI"
+  ],
+  "category": "Visual Scripting",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AkiKurisu/AkiGOAP.git"
+  },
+  "author": {
+    "name": "AkiKurisu",
+    "url": "https://github.com/AkiKurisu"
+  }
+}

@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b0bf648db7d5064b97c6697130b2231, type: 3}
+  m_Name: ExampleSet
+  m_EditorClassIdentifier: 
+  behaviors:
+  - rid: 7958656891248181250
+  - rid: 7958656891248181251
+  - rid: 7958656891248181252
+  - rid: 7958656891248181253
+  - rid: 7958656891248181254
+  - rid: 7958656891248181255
+  - rid: 7958656891248181256
+  Description: "\u8BE5Agent\u5728\u62E5\u6709\u80FD\u91CF\u4F7F\u4F1A\u8FFD\u9010\u73A9\u5BB6\n\u5982\u679C\u6CA1\u6709\u80FD\u91CF\u5219\u5230\u4E00\u4E2A\u5C31\u8FD1\u7684\u4F11\u606F\u70B9\u6062\u590D\u80FD\u91CF\nThe
+    Agent will chase the player if it has power\r\nIf there is no energy, go to a
+    nearby rest point to restore energy"
+  references:
+    version: 2
+    RefIds:
+    - rid: 7958656891248181250
+      type: {class: FollowPlayerGoal, ns: Kurisu.GOAP.Example, asm: Kurisu.GOAP.Example}
+      data:
+        description: 
+        guid: bfcd7316-32e6-424c-a567-89ae1401060b
+        distance: 4
+    - rid: 7958656891248181251
+      type: {class: RestoreEnergyGoal, ns: Kurisu.GOAP.Example, asm: Kurisu.GOAP.Example}
+      data:
+        description: 
+        guid: 44c8c7ab-06a5-4220-bf03-17c826d20059
+        minAmount: 0
+    - rid: 7958656891248181252
+      type: {class: GoToTent, ns: Kurisu.GOAP.Example, asm: Kurisu.GOAP.Example}
+      data:
+        description: 
+        guid: a20e1561-b935-4562-b884-5258d73a6c9f
+    - rid: 7958656891248181253
+      type: {class: Idle, ns: Kurisu.GOAP.Example, asm: Kurisu.GOAP.Example}
+      data:
+        description: 
+        guid: 127172d4-bc21-47d8-a85e-31ec5ea7914a
+    - rid: 7958656891248181254
+      type: {class: GoToHome, ns: Kurisu.GOAP.Example, asm: Kurisu.GOAP.Example}
+      data:
+        description: 
+        guid: 16795218-b6c8-415e-9afd-9a7faef76151
+    - rid: 7958656891248181255
+      type: {class: GoToPlayer, ns: Kurisu.GOAP.Example, asm: Kurisu.GOAP.Example}
+      data:
+        description: 
+        guid: 54c96557-6d9c-4871-91e5-f6cf65fc4e15
+    - rid: 7958656891248181256
+      type: {class: HaveARest, ns: Kurisu.GOAP.Example, asm: Kurisu.GOAP.Example}
+      data:
+        description: 
+        guid: 87a5de57-f8e0-482d-a3dd-610463389d0c
+        waitTime: 5
