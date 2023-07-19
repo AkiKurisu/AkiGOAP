@@ -18,5 +18,8 @@
   "author": {
     "name": "AkiKurisu",
     "url": "https://github.com/AkiKurisu"
+  },
+  "dependencies": {
+    "com.unity.collections": "1.2.4"
   }
 }
