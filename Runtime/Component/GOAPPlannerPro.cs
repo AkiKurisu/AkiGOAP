@@ -11,8 +11,8 @@ namespace Kurisu.GOAP
     /// Pro version using job system and burst compiler to support multi-thread
     /// </summary>
     [RequireComponent(typeof(GOAPWorldState))]
-    public class GOAPPlannerPro:MonoBehaviour,IPlanner
-    {    
+    public class GOAPPlannerPro : MonoBehaviour, IPlanner
+    {
         [BurstCompile]
         private struct GoalSorter : IComparer<IGoal>
         {
@@ -22,145 +22,170 @@ namespace Kurisu.GOAP
             }
         }
         protected GOAPWorldState worldState;
-        public GOAPWorldState WorldState=>worldState;
-        protected readonly List<IGoal> goals=new();
-        protected readonly List<IAction> actions=new();
-        public IGoal ActivateGoal{get; private set;}
-        int IPlanner.activeActionIndex=>0;
+        public GOAPWorldState WorldState => worldState;
+        protected readonly List<IGoal> goals = new();
+        protected readonly List<IAction> actions = new();
+        public IGoal ActivateGoal { get; private set; }
+        int IPlanner.activeActionIndex => 0;
         private IAction candidateAction;
         private IAction activateAction;
-        private List<IAction> candidatePlan=new();
-        public IAction ActivateAction=>activateAction;
-        public List<IAction> ActivatePlan{get; private set;}=new();
+        private List<IAction> candidatePlan = new();
+        public IAction ActivateAction => activateAction;
+        public List<IAction> ActivatePlan { get; private set; } = new();
         private IGoal candidateGoal;
-        private List<IGoal> candidateGoals=new();
-        internal List<IGoal> CandidateGoals=>candidateGoals;
+        private List<IGoal> candidateGoals = new();
+        internal List<IGoal> CandidateGoals => candidateGoals;
         // Loggers
-        [SerializeField,Tooltip("Control the log message of planner. Never: No log; OnlyActive: Only logging active plan message; IncludeSearch: Include "+
-        "searching detail like action select information; IncludeFail: Include logging all fail message like fail to find path or fail to find a goal. "+
+        [SerializeField, Tooltip("Control the log message of planner. Never: No log; OnlyActive: Only logging active plan message; IncludeSearch: Include " +
+        "searching detail like action select information; IncludeFail: Include logging all fail message like fail to find path or fail to find a goal. " +
         "Always: Log all message")]
         private LogType logType;
-        private bool logActive=>logType.HasFlag(LogType.OnlyActive);
-        private bool logSearch=>logType.HasFlag(LogType.IncludeSearch);
-        private bool logFail=>logType.HasFlag(LogType.IncludeFail);
-        [SerializeField,Tooltip("Nothing: Automatically update planner.\n"+
-        "ManualUpdateGoal: Toggle this to disable planner to tick goal automatically.\n"+
-        "ManualActivatePlanner: Toggle this to disable planner to tick and search plan automatically,"+
+        private bool logActive => logType.HasFlag(LogType.OnlyActive);
+        private bool logSearch => logType.HasFlag(LogType.IncludeSearch);
+        private bool logFail => logType.HasFlag(LogType.IncludeFail);
+        [SerializeField, Tooltip("Nothing: Automatically update planner.\n" +
+        "ManualUpdateGoal: Toggle this to disable planner to tick goal automatically.\n" +
+        "ManualActivatePlanner: Toggle this to disable planner to tick and search plan automatically," +
         " however when the plan is generated, the planner will focus that plan until the plan is deactivated. So you can't stop plan manually.")]
         private TickType tickType;
         [SerializeField]
         private bool skipSearchWhenActionRunning;
-        internal bool SkipSearchWhenActionRunning=>skipSearchWhenActionRunning;
-        public List<GOAPBehavior> Behaviors=>Enumerable.Empty<GOAPBehavior>().Concat(actions.OfType<GOAPBehavior>()).Concat(goals.OfType<GOAPBehavior>()).ToList();
-        public UnityEngine.Object _Object =>gameObject;
+        internal bool SkipSearchWhenActionRunning => skipSearchWhenActionRunning;
+        public List<GOAPBehavior> Behaviors => Enumerable.Empty<GOAPBehavior>().Concat(actions.OfType<GOAPBehavior>()).Concat(goals.OfType<GOAPBehavior>()).ToList();
+        public UnityEngine.Object _Object => gameObject;
         public event System.Action<IPlanner> OnUpdatePlanEvent;
         private GOAPJobRunner jobRunner;
-        private bool isDirty=false;
-        public bool IsActive{get;private set;}=true;
-        private void Awake() {
+        private bool isDirty = false;
+        [SerializeField]
+        private bool isActive;
+        private bool activateFlag = false;
+        private void Awake()
+        {
             worldState = GetComponent<GOAPWorldState>();
-            IsActive&=!tickType.HasFlag(TickType.ManualActivatePlanner);
+            isActive &= !tickType.HasFlag(TickType.ManualActivatePlanner);
         }
-        private void Update(){
-            if(isDirty)
+        private void Update()
+        {
+            if (activateFlag)
             {
-                isDirty=false;
-                jobRunner?.Dispose();
-                jobRunner=new GOAPJobRunner(this,new GraphResolver(actions.Cast<INode>().Concat(goals)));
+                isActive = true;
+                activateFlag = false;
             }
-            if(IsActive)Tick();
+            if (isDirty)
+            {
+                isDirty = false;
+                jobRunner?.Dispose();
+                jobRunner = new GOAPJobRunner(this, new GraphResolver(actions.Cast<INode>().Concat(goals)));
+            }
+            if (isActive) Tick();
         }
         public void ManualActivate()
         {
-            IsActive=true;
+            //Ensure jobRunner activate in Update()
+            activateFlag = true;
         }
-        private void LateUpdate() {
-            if(!IsActive)return;
+        private void LateUpdate()
+        {
+            if (!isActive) return;
             //Ensure job is completed
             jobRunner?.Complete();
-            bool debugUpdate=false;
-            if ((NoActiveGoal() && CandidateGoalAvailable()) || BetterGoalAvailable()){
+            bool debugUpdate = false;
+            if ((NoActiveGoal() && CandidateGoalAvailable()) || BetterGoalAvailable())
+            {
                 StartCurrentBestGoal();
-                debugUpdate=true;
+                debugUpdate = true;
             }
-            else if(HaveNextAction())
+            else if (HaveNextAction())
             {
                 StartCurrentBestAction();
-                debugUpdate=true;
+                debugUpdate = true;
             }
-            if(debugUpdate)
+            if (debugUpdate)
                 OnUpdatePlanEvent?.Invoke(this);
             else
             {
-                if(tickType.HasFlag(TickType.ManualActivatePlanner))
+                if (tickType.HasFlag(TickType.ManualActivatePlanner))
                 {
-                    IsActive=false;
-                    if(logSearch)PlannerLog("Manual plan updating ends, need to be activated manully again.",bold:true);
+                    isActive = false;
+                    if (logSearch) PlannerLog("Manual plan updating ends, need to be activated manully again.", bold: true);
                 }
             }
         }
-        private void OnDestroy() {
+        private void OnDestroy()
+        {
             jobRunner?.Dispose();
         }
         void IPlanner.InjectGoals(IEnumerable<IGoal> source)
         {
             goals.Clear();
-            foreach(var goal in source)
+            foreach (var goal in source)
             {
                 goals.Add(goal);
                 goal.Init(worldState);
             }
-            isDirty=true;
+            isDirty = true;
         }
         void IPlanner.InjectActions(IEnumerable<IAction> source)
         {
             actions.Clear();
-            foreach(var action in source)
+            foreach (var action in source)
             {
                 actions.Add(action);
                 action.Init(worldState);
             }
-            isDirty=true;
+            isDirty = true;
         }
-        internal void SetCandidate(List<IAction> path,IGoal goal)
+        internal void SetCandidate(List<IAction> path, IGoal goal)
         {
-            var action=path[0];
+            if (goal == null || path.Count == 0)
+            {
+                candidatePlan.Clear();
+                candidateAction = null;
+                candidateGoal = null;
+                if (logFail) PlannerLog("No candiate goal or path was found.");
+                return;
+            }
+            var action = path[0];
             candidatePlan.Clear();
             candidatePlan.AddRange(path);
-            if(candidateAction!=action&&logSearch)PlannerLog($"Search candidate action:{action.Name}");
-            candidateAction=action;
-            if(candidateGoal!=goal&&logSearch)PlannerLog($"Search candidate goal:{goal.Name}");
-            candidateGoal=goal;
+            if (candidateAction != action && logSearch) PlannerLog($"Search candidate action:{action.Name}");
+            candidateAction = action;
+            if (candidateGoal != goal && logSearch) PlannerLog($"Search candidate goal:{goal.Name}");
+            candidateGoal = goal;
         }
-        List<IAction> IPlanner.GetAllActions()=>actions;
+        List<IAction> IPlanner.GetAllActions() => actions;
         public void Tick()
         {
-            if(!tickType.HasFlag(TickType.ManualUpdateGoal))TickGoals();
+            if (!tickType.HasFlag(TickType.ManualUpdateGoal)) TickGoals();
             OnTickActivePlan();
             GetHighestPriorityGoals(candidateGoals);
             jobRunner?.Run();
         }
 
-        private bool NoActiveGoal(){
+        private bool NoActiveGoal()
+        {
             return ActivateGoal == null;
         }
         private bool HaveNextAction()
         {
-            return candidateAction !=null && candidateAction != ActivateAction;
+            return candidateAction != null && candidateAction != ActivateAction;
         }
-        private bool BetterGoalAvailable(){
+        private bool BetterGoalAvailable()
+        {
             return candidateGoal != null && candidateGoal != ActivateGoal;
         }
 
-        private bool CandidateGoalAvailable(){
+        private bool CandidateGoalAvailable()
+        {
             return candidateAction != null && candidateGoal != null;
         }
 
-        private void StartCurrentBestGoal(){
+        private void StartCurrentBestGoal()
+        {
             //Activate Goal
             ActivateGoal?.OnDeactivate();
             ActivateGoal = candidateGoal;
-            if(logActive)ActivePlanLog($"Starting new plan for {ActivateGoal.Name}", bold:true);
+            if (logActive) ActivePlanLog($"Starting new plan for {ActivateGoal.Name}", bold: true);
             ActivateGoal.OnActivate();
             //Activate Action
             StartCurrentBestAction();
@@ -169,47 +194,55 @@ namespace Kurisu.GOAP
         {
             ActivateAction?.OnDeactivate();
             SetCurrentAction(candidateAction);
-            if(logActive)ActivePlanLog($"Starting {ActivateAction.Name}");
+            if (logActive) ActivePlanLog($"Starting {ActivateAction.Name}");
             ActivateAction.OnActivate();
         }
-        public void TickGoals(){
-            if (goals != null){
-                for (int i = 0; i < goals.Count; i++){
+        public void TickGoals()
+        {
+            if (goals != null)
+            {
+                for (int i = 0; i < goals.Count; i++)
+                {
                     goals[i].OnTick();
                 }
             }
         }
-        private void OnTickActivePlan(){
+        private void OnTickActivePlan()
+        {
             // Nothing to run
-            if (ActivateGoal == null || ActivateAction == null){ return; }
+            if (ActivateGoal == null || ActivateAction == null) { return; }
             // Goal no longer viable
-            if (!ActivateGoal.PreconditionsSatisfied(worldState)){
-                if(logActive)ActivePlanLog(
+            if (!ActivateGoal.PreconditionsSatisfied(worldState))
+            {
+                if (logActive) ActivePlanLog(
                     $"{ActivateGoal.Name} failed as preconditions are no longer satisfied",
-                    bold:true
+                    bold: true
                 );
                 OnCompleteOrFailActivePlan();
                 return;
             }
 
             // Plan no longer viable
-            if (!(ActivateAction.PreconditionsSatisfied(worldState))){ 
-                if(logActive)ActivePlanLog(
+            if (!(ActivateAction.PreconditionsSatisfied(worldState)))
+            {
+                if (logActive) ActivePlanLog(
                     $"{ActivateAction.Name} failed as preconditions are no longer satisfied",
-                    bold:true
+                    bold: true
                     );
-                OnCompleteOrFailActivePlan(); 
+                OnCompleteOrFailActivePlan();
                 return;
             }
             ActivateAction.OnTick();
             // Goal complete
-            if (ActivateGoal.ConditionsSatisfied(worldState)){
-                if(logActive)ActivePlanLog($"{ActivateGoal.Name} completed", bold:true);
+            if (ActivateGoal.ConditionsSatisfied(worldState))
+            {
+                if (logActive) ActivePlanLog($"{ActivateGoal.Name} completed", bold: true);
                 OnCompleteOrFailActivePlan();
                 return;
             }
         }
-        private void OnCompleteOrFailActivePlan(){
+        private void OnCompleteOrFailActivePlan()
+        {
             ActivateAction?.OnDeactivate();
             ActivateGoal?.OnDeactivate();
             ActivateGoal = null;
@@ -218,8 +251,8 @@ namespace Kurisu.GOAP
         private void SetCurrentAction(IAction action)
         {
             ActivatePlan.Clear();
-            activateAction=action;
-            if(activateAction!=null)
+            activateAction = action;
+            if (activateAction != null)
                 ActivatePlan.AddRange(candidatePlan);
         }
         /// <summary>
@@ -227,17 +260,21 @@ namespace Kurisu.GOAP
         ///  has a valid plan
         /// </summary>
         /// <param name="chosenGoal"></param>
-        private void GetHighestPriorityGoals(List<IGoal> chosenGoals){
+        private void GetHighestPriorityGoals(List<IGoal> chosenGoals)
+        {
             chosenGoals.Clear();
             //Searching for highest priority goal
-            if (goals == null||goals.Count==0){
-                if(logFail)PlannerLog("No goals found");
+            if (goals == null || goals.Count == 0)
+            {
+                if (logFail) PlannerLog("No goals found");
                 return;
             }
-            for (int i = 0; i < goals.Count; i++){
+            for (int i = 0; i < goals.Count; i++)
+            {
 
-                if (!goals[i].PreconditionsSatisfied(worldState)){
-                    if(logFail)PlannerLog($"{goals[i].Name} not valid as preconditions not satisfied");
+                if (!goals[i].PreconditionsSatisfied(worldState))
+                {
+                    if (logFail) PlannerLog($"{goals[i].Name} not valid as preconditions not satisfied");
                     continue;
                 }
                 chosenGoals.Add(goals[i]);
@@ -251,7 +288,8 @@ namespace Kurisu.GOAP
         List<GoalData> IPlanner.GetSortedGoalData()
         {
             List<GoalData> goalData = new List<GoalData>();
-            for (int i=0; i<goals.Count; i++){
+            for (int i = 0; i < goals.Count; i++)
+            {
                 goalData.Add(
                     new GoalData(goals[i].Name, goals[i].GetPriority(), goals[i].PreconditionsSatisfied(worldState))
                 );
@@ -260,20 +298,24 @@ namespace Kurisu.GOAP
             goalData.Reverse();
             return goalData;
         }
-        private void ActivePlanLog(object message, bool bold=false){
+        private void ActivePlanLog(object message, bool bold = false)
+        {
             string s = $"<color=#5BDB14>ActivePlan: {message}</color>";
-            if (bold){
+            if (bold)
+            {
                 s = "<b>" + s + "</b>";
             }
-            Debug.Log(s,this);
+            Debug.Log(s, this);
         }
 
-        private void PlannerLog(object message, bool bold=false){
+        private void PlannerLog(object message, bool bold = false)
+        {
             string s = $"<color=#00C2FF>Planner: {message}</color>";
-            if (bold){
+            if (bold)
+            {
                 s = "<b>" + s + "</b>";
             }
-            Debug.Log(s,this);
+            Debug.Log(s, this);
         }
     }
 }

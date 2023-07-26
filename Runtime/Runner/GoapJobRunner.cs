@@ -14,12 +14,12 @@ namespace Kurisu.GOAP.Runner
         private readonly IPositionBuilder positionBuilder;
         private readonly ICostBuilder costBuilder;
         private readonly IConditionBuilder conditionBuilder;
-        private List<IAction> resultCache=new();
+        private List<IAction> resultCache = new();
         public GOAPJobRunner(GOAPPlannerPro planner, IGraphResolver graphResolver)
         {
             this.planner = planner;
             this.resolver = graphResolver;
-            
+
             this.executableBuilder = this.resolver.GetExecutableBuilder();
             this.positionBuilder = this.resolver.GetPositionBuilder();
             this.costBuilder = this.resolver.GetCostBuilder();
@@ -28,33 +28,33 @@ namespace Kurisu.GOAP.Runner
 
         public void Run()
         {
-            this.resolveHandles.Clear();            
+            this.resolveHandles.Clear();
             RunInternal(planner);
         }
 
         private void RunInternal(GOAPPlannerPro planner)
         {
-            if (planner==null)
+            if (planner == null)
                 return;
-            if(planner.CandidateGoals.Count==0)
+            if (planner.CandidateGoals.Count == 0)
                 return;
-            if(planner.ActivateAction!=null&&planner.SkipSearchWhenActionRunning)
+            if (planner.ActivateAction != null && planner.SkipSearchWhenActionRunning)
                 return;
-            this.FillBuilders(planner,planner.transform);
+            this.FillBuilders(planner, planner.transform);
             //Create job for each candidate goal
-            foreach(var goal in planner.CandidateGoals)
-            this.resolveHandles.Add(new JobRunHandle(planner,goal,this.resolver.StartResolve(new RunData
-            {
-                StartIndex = this.resolver.GetIndex(goal),
-                IsExecutable = new NativeArray<bool>(this.executableBuilder.Build(), Allocator.TempJob),
-                Positions = new NativeArray<float3>(this.positionBuilder.Build(), Allocator.TempJob),
-                Costs = new NativeArray<float>(this.costBuilder.Build(), Allocator.TempJob),
-                ConditionsMet = new NativeArray<bool>(this.conditionBuilder.Build(), Allocator.TempJob),
-                DistanceMultiplier = 1f
-            })));
+            foreach (var goal in planner.CandidateGoals)
+                this.resolveHandles.Add(new JobRunHandle(goal, this.resolver.StartResolve(new RunData
+                {
+                    StartIndex = this.resolver.GetIndex(goal),
+                    IsExecutable = new NativeArray<bool>(this.executableBuilder.Build(), Allocator.TempJob),
+                    Positions = new NativeArray<float3>(this.positionBuilder.Build(), Allocator.TempJob),
+                    Costs = new NativeArray<float>(this.costBuilder.Build(), Allocator.TempJob),
+                    ConditionsMet = new NativeArray<bool>(this.conditionBuilder.Build(), Allocator.TempJob),
+                    DistanceMultiplier = 1f
+                })));
         }
 
-        private void FillBuilders(IPlanner agent,Transform transform)
+        private void FillBuilders(IPlanner agent, Transform transform)
         {
             this.executableBuilder.Clear();
             this.positionBuilder.Clear();
@@ -62,10 +62,10 @@ namespace Kurisu.GOAP.Runner
 
             foreach (var node in agent.GetAllActions())
             {
-                var allMet = true; 
+                var allMet = true;
                 foreach (var condition in node.Conditions)
                 {
-                    if (!agent.WorldState.InSet(condition.Key,condition.Value))
+                    if (!agent.WorldState.InSet(condition.Key, condition.Value))
                     {
                         allMet = false;
                         continue;
@@ -74,15 +74,15 @@ namespace Kurisu.GOAP.Runner
                 }
                 this.executableBuilder.SetExecutable(node, allMet);
                 this.costBuilder.SetCost(node, node.GetCost());
-                this.positionBuilder.SetPosition(node, agent.WorldState.ResolveNodeTarget(node)?.position??transform.position);
+                this.positionBuilder.SetPosition(node, agent.WorldState.ResolveNodeTarget(node)?.position ?? transform.position);
             }
         }
         public void Complete()
         {
-            bool find=false;
+            bool find = false;
             foreach (var resolveHandle in this.resolveHandles)
             {
-                if(find)
+                if (find)
                 {
                     //Already search a plan, just complete
                     resolveHandle.Handle.CompleteNonAlloc(ref resultCache);
@@ -90,17 +90,19 @@ namespace Kurisu.GOAP.Runner
                 }
                 resultCache.Clear();
                 resolveHandle.Handle.CompleteNonAlloc(ref resultCache);
-                if (resolveHandle.Agent==null)
+                if (planner == null)
                     continue;
-                if(resultCache.Count!=0)
+                if (resultCache.Count != 0)
                 {
                     //Get candidate goal and action with highest priority
-                    resolveHandle.Agent.SetCandidate(resultCache,resolveHandle.Goal);
+                    planner.SetCandidate(resultCache, resolveHandle.Goal);
                     //If not find, thus fall back to next handle
-                    find=true;
+                    find = true;
                 }
             }
             this.resolveHandles.Clear();
+            if (!find)
+                planner.SetCandidate(resultCache, null);
         }
 
         public void Dispose()
@@ -109,20 +111,18 @@ namespace Kurisu.GOAP.Runner
             {
                 resolveHandle.Handle.CompleteNonAlloc(ref resultCache);
             }
-            
+
             this.resolver.Dispose();
         }
 
         private struct JobRunHandle
         {
-            public GOAPPlannerPro Agent { get; }
-            public IGoal Goal{get;}
+            public IGoal Goal { get; }
             public IResolveHandle Handle { get; set; }
-            public JobRunHandle(GOAPPlannerPro agent,IGoal goal,IResolveHandle handle)
+            public JobRunHandle(IGoal goal, IResolveHandle handle)
             {
-                this.Agent = agent;
                 this.Goal = goal;
-                this.Handle=handle;
+                this.Handle = handle;
             }
         }
     }

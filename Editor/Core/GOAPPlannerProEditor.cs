@@ -4,42 +4,47 @@ using UnityEngine;
 using UnityEngine.UIElements;
 namespace Kurisu.GOAP.Editor
 {
-    [CustomEditor(typeof(GOAPPlannerPro),true)]
+    [CustomEditor(typeof(GOAPPlannerPro), true)]
     public class GOAPPlannerProEditor : UnityEditor.Editor
     {
-        private const string LabelText="AkiGOAP <size=12>V1.0</size> Planner Pro";
-        private const string ButtonText="Open Planner Snapshot";
-        private const string GraphButtonText="Open GOAP Editor";
-        private const string SkilSearchTooltip="Enabled to skip search plan when already have an action, toggle this will need you to set correct precondition"+
+        private const string LabelText = "AkiGOAP <size=12>V1.0</size> Planner Pro";
+        private const string ButtonText = "Open Planner Snapshot";
+        private const string GraphButtonText = "Open GOAP Editor";
+        private const string SkilSearchTooltip = "Enabled to skip search plan when already have an action, toggle this will need you to set correct precondition" +
         "for each action to let it quit by itself";
         public override VisualElement CreateInspectorGUI()
         {
             var myInspector = new VisualElement();
-            myInspector.Add(UIUtility.GetLabel(LabelText,20));
+            myInspector.Add(UIUtility.GetLabel(LabelText, 20));
             //Default
             InspectorElement.FillDefaultInspector(myInspector, serializedObject, this);
             myInspector.Remove(myInspector.Q<PropertyField>("PropertyField:m_Script"));
             myInspector.Remove(myInspector.Q<PropertyField>("PropertyField:skipSearchWhenActionRunning"));
+            myInspector.Remove(myInspector.Q<PropertyField>("PropertyField:isActive"));
             //Setting
             myInspector.AddSpace();
-            UIUtility.GetLabel("Normal Setting",14,color:UIUtility.AkiBlue,anchor:TextAnchor.MiddleLeft).AddTo(myInspector);
+            UIUtility.GetLabel("Normal Setting", 14, color: UIUtility.AkiBlue, anchor: TextAnchor.MiddleLeft).AddTo(myInspector);
             myInspector.Q<PropertyField>("PropertyField:logType").MoveToEnd(myInspector);
             myInspector.Q<PropertyField>("PropertyField:tickType").MoveToEnd(myInspector);
+            var isActive = new Toggle("Is Active");
+            isActive.tooltip = SkilSearchTooltip;
+            isActive.BindProperty(serializedObject.FindProperty("isActive"));
+            isActive.AddTo(myInspector);
             myInspector.AddSpace();
-            UIUtility.GetLabel("Pro Setting",14,color:UIUtility.AkiBlue,anchor:TextAnchor.MiddleLeft).AddTo(myInspector);
-            var skipSearchProperty=serializedObject.FindProperty("skipSearchWhenActionRunning");
-            var skipSearchToggle=new Toggle("Skip Search When Action Running");
-            skipSearchToggle.tooltip=SkilSearchTooltip;
+            UIUtility.GetLabel("Pro Setting", 14, color: UIUtility.AkiBlue, anchor: TextAnchor.MiddleLeft).AddTo(myInspector);
+            var skipSearchProperty = serializedObject.FindProperty("skipSearchWhenActionRunning");
+            var skipSearchToggle = new Toggle("Skip Search When Action Running");
+            skipSearchToggle.tooltip = SkilSearchTooltip;
             skipSearchToggle.BindProperty(skipSearchProperty);
             skipSearchToggle.AddTo(myInspector);
             //SnapShot
-            UIUtility.GetButton(ButtonText,UIUtility.AkiRed,ShowPlannerWindow,100)
+            UIUtility.GetButton(ButtonText, UIUtility.AkiRed, ShowPlannerWindow, 100)
                 .Enabled(Application.isPlaying)
                 .AddTo(myInspector);
             //Editor
-            UIUtility.GetButton(GraphButtonText,UIUtility.AkiBlue,ShowGOAPEditor,100)
+            UIUtility.GetButton(GraphButtonText, UIUtility.AkiBlue, ShowGOAPEditor, 100)
                 .Enabled(Application.isPlaying)
-                .AddTo(myInspector); 
+                .AddTo(myInspector);
             return myInspector;
         }
         private void ShowPlannerWindow()

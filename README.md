@@ -2,7 +2,8 @@
 
 AkiGOAP是一个支持可视化、模块化编辑，支持多线程的Goal Oriented Action Planner（目标导向的行为规划）Unity插件，同时集成了多个开源GOAP插件的功能。
 
-## 特点
+AkiGOAP is a Goal Oriented Action Planner unity plugin that supports visualization, modular editing, and multi-threading, which integrates the functions of multiple open source GOAP plugins.
+## 特点 Features
 
 1. 多线程, 使用Unity Job System
 
@@ -22,12 +23,7 @@ AkiGOAP是一个支持可视化、模块化编辑，支持多线程的Goal Orien
 
 <img src="Images/SnapShot.png" />
 
-## 安装
-1. 从Release下载Package [Release Package](https://github.com/AkiKurisu/AkiGOAP/releases)
-2. 使用Unity Package Manager通过git URL下载 ```https://github.com/AkiKurisu/AkiGOAP.git```
-#
-
-## 如何使用
+## 如何使用 How To Use
 
 由于GOAP AI的设计需要一定门槛，我只介绍如何使用插件的核心功能，具体的设计可以参考插件提供的Example样例。
 
@@ -80,7 +76,7 @@ AkiGOAP是一个支持可视化、模块化编辑，支持多线程的Goal Orien
 8. 点击GOAPPlanner或GOAPPlannerPro的```Open GOAP Editor```打开编辑器查看当前所有Goal的Priority优先级和所有Action的Cost代价
 9. 点击GOAPPlanner或GOAPPlannerPro的```Open Planner Snapshot```打开快照查看当前的Plan计划（即抵达当前Goal的一串Action序列）
 
-## 说明
+## 说明 Explanation
 1. GOAPPlanner没有使用JobSystem，仅使用对象池减少了GC开销，适用于复杂度较低的任务，优化自 https://github.com/toastisme/OpenGOAP 
 
     特点：根据优先级最高的Goal搜索路径，没有搜索到则FallBack至下一优先级的Goal
