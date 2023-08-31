@@ -1,37 +1,40 @@
 # AkiGOAP
 
-AkiGOAP是一个支持可视化、模块化编辑，支持多线程的Goal Oriented Action Planner（目标导向的行为规划）Unity插件，同时集成了多个开源GOAP插件的功能。
-
 AkiGOAP is a Goal Oriented Action Planner unity plugin that supports visualization, modular editing, and multi-threading, which integrates the functions of multiple open source GOAP plugins.
-## 特点 Features
 
-1. 多线程, 使用Unity Job System
+## Features
 
-2. 可视化编辑器
+1. Multi-thread, using Unity Job System
+
+2. Visual Graph Editor
 
 <img src="Images/GraphEditor.png" />
 
-- 支持Runtime时Debug
+- Allow debug in runtime play mode
 
 <img src="Images/GraphEditorDebug.png"/>
 
-3. 自定义输出决策细节
+3. Log detail with customized level
 
 <img src="Images/Log.png" />
 
-4. 决策快照
+4. Take snapShot of current plan searching
 
 <img src="Images/SnapShot.png" />
 
-## 如何使用 How To Use
+## Set Up
+1. Download [Release Package](https://github.com/AkiKurisu/AkiGOAP/releases)
+2. Using git URL to download package by Unity PackageManager ```https://github.com/AkiKurisu/AkiGOAP.git```
+#
 
-由于GOAP AI的设计需要一定门槛，我只介绍如何使用插件的核心功能，具体的设计可以参考插件提供的Example样例。
+## How To Use
 
-1. 在Asset文件夹内右键菜单```Create/AkiGOAP/GOAPSet```创建GOAPSet
-2. 点击```Open GOAP Editor```打开编辑器
-3. 右键创建Goal结点或Action结点，将两种结点分别拖入```GOAP Goal Stack```和```Action Stack```中
-4. 创建GameObject挂载GOAPPlanner或GOAPPlannerPro，同时会挂载GOAPWorldState
-5. 编写Agent脚本，示例如下：
+Since the design of GOAP AI requires a certain threshold, I only introduce how to use the core functions of the plugin. For the specific design, please refer to the Example sample provided by the plugin.
+1. In the Asset folder, right-click the menu ```Create/AkiGOAP/GOAPSet``` to create a GOAPSet
+2. Click ```Open GOAP Editor``` to open the editor
+3. Right-click to create a Goal node or Action node, and drag the two nodes into ```GOAP Goal Stack``` and ```Action Stack``` respectively
+4. Create a GameObject to mount GOAPPlanner or GOAPPlannerPro, and also mount GOAPWorldState
+5. Write the Agent script, the example is as follows:
     ```c#
     using UnityEngine;
     using UnityEngine.AI;
@@ -40,7 +43,7 @@ AkiGOAP is a Goal Oriented Action Planner unity plugin that supports visualizati
     {
         public class ExampleAgent : MonoBehaviour
         {
-            //此处的IPlanner也可以为GOAPPlanner或GOAPPlannerPro
+            //You can use GOAPPlanner or GOAPPlannerPro
             private IPlanner planner;
             private NavMeshAgent navMeshAgent;
             public NavMeshAgent NavMeshAgent=>navMeshAgent;
@@ -52,7 +55,7 @@ AkiGOAP is a Goal Oriented Action Planner unity plugin that supports visualizati
             private void Start() {
                 navMeshAgent=GetComponent<NavMeshAgent>();
                 planner=GetComponent<IPlanner>();
-                //你可以通关继承并使用Linq的Cast或OfType获取自定义的子类并进行依赖的注入
+                //You can pass inheritance and use Linq's Cast or OfType to get custom subclasses and perform dependency injection
                 var goals=dataSet.GetGoals();
                 foreach(var goal in goals.OfType<ExampleGoal>())
                 {
@@ -63,7 +66,7 @@ AkiGOAP is a Goal Oriented Action Planner unity plugin that supports visualizati
                 {
                     action.Inject(this);
                 }
-                //最后你需要将Goal和Action注入Planner中
+                //Finally you need to inject Goal and Action into Planner
                 planner.InjectGoals(goals);
                 planner.InjectActions(actions);
             }
@@ -71,17 +74,17 @@ AkiGOAP is a Goal Oriented Action Planner unity plugin that supports visualizati
     }
 
     ```
-6. 在上述GameObejct上挂载Agent脚本，并拖入之前制作的GOAPSet
-7. 点击Play，在Start时所有Goal和Action均会获取其依赖进行初始化
-8. 点击GOAPPlanner或GOAPPlannerPro的```Open GOAP Editor```打开编辑器查看当前所有Goal的Priority优先级和所有Action的Cost代价
-9. 点击GOAPPlanner或GOAPPlannerPro的```Open Planner Snapshot```打开快照查看当前的Plan计划（即抵达当前Goal的一串Action序列）
+6. Mount the Agent script on the GameObject above, and drag in the previously created GOAPSet
+7. Click Play, and all Goals and Actions will obtain their dependencies for initialization at Start
+8. Click ```Open GOAP Editor``` of GOAPPlanner or GOAPPlannerPro to open the editor to view the Priority of all current Goals and the Cost of all Actions
+9. Click ```Open Planner Snapshot``` of GOAPPlanner or GOAPPlannerPro to open the snapshot to view the current Plan plan (that is, a series of Action sequences that reach the current Goal)
 
-## 说明 Explanation
-1. GOAPPlanner没有使用JobSystem，仅使用对象池减少了GC开销，适用于复杂度较低的任务，优化自 https://github.com/toastisme/OpenGOAP 
+## Explanation
+1. GOAPPlanner does not use JobSystem, only uses object pool to reduce GC overhead, suitable for tasks with low complexity, optimized from https://github.com/toastisme/OpenGOAP
 
-    特点：根据优先级最高的Goal搜索路径，没有搜索到则FallBack至下一优先级的Goal
+     Features: According to the Goal search path with the highest priority, if not found, FallBack to the Goal with the next priority
 
-2. GOAPPlannerPro使用了JobSystem，参考自 https://github.com/crashkonijn/GOAP ，创建的Job可以将Position加入Cost计算，使用样例如下：
+2. GOAPPlannerPro uses JobSystem, refer to https://github.com/crashkonijn/GOAP , the created Job can add Position to Cost calculation, the usage example is as follows:
     ```C#
     using UnityEngine;
     namespace Kurisu.GOAP.Example
@@ -90,13 +93,14 @@ AkiGOAP is a Goal Oriented Action Planner unity plugin that supports visualizati
         {
             protected override void SetupDerived()
             {
-                //注册该结点所绑定的Transform
+                //Register Transform bound to this node
                 worldState.RegisterNodeTarget(this,agent.Home);
             }
         }
     }
     ```
-    特点：将所有Goal和Action加入搜索的图，为每一个Goal创建Job进行路径搜索。根据优先级采纳搜索结果。
+    Features: Add all Goals and Actions to the search graph, and create a Job for each Goal to search for paths. Feed search results based on priority.
 
-3. 关于GOAPPlanner和GOAPPlannerPro的```TickType```，由于GOAP使用比较费，我们可以考虑在不需要它的时候关闭Plan的搜索。勾选```ManualUpdateGoal```则Goal的更新都变更为手动调用。勾选```ManualActivatePlanner```则Planner不再自动搜索Plan，需要手动调用```ManualActivate()```激活，并且Planner在激活后第一次失去Plan时再次关闭。该选项适用于一些回合制游戏，通常这些游戏的AI仅需在特定回合或特定时间段进行Plan的搜索。
-4. 关于GOAPPlannerPro的```Skip Search When Action Running```, Pro版本默认会在每帧获取全部Goal情况下的Plan（即Action序列）, 典型例子为：目标A需要一个物品，而获得物品需要先进行移动行为B再进行采集行为C。搜索到当前的Action为B后，AI将进行B行为。如果要让AI在B完成后进行采集行为C，我们应当在B完成后通知Planner重新搜索或者每帧进行搜索。如果勾选该选项，Planner就会在拥有Action时不再搜索，你需要让Action主动关闭自己，例如使该Action处于Precondition不满足的状态。
+3. Regarding ```TickType``` of GOAPPlanner and GOAPPlannerPro, since GOAP is relatively expensive to use, we can consider turning off the search of Plan when it is not needed. Check ```ManualUpdateGoal``` to change the Goal update to manual call. Check ```ManualActivatePlanner```, the Planner will no longer automatically search for the plan, you need to manually call ```ManualActivate()``` to activate, and the planner will be closed again when it loses the plan for the first time after activation. This option is suitable for some turn-based games. Usually, the AI of these games only needs to search for a plan in a specific round or a specific time period.
+   
+4. Regarding the ```Skip Search When Action Running``` of GOAPPlannerPro, the Pro version will obtain the Plan (that is, the Action sequence) of all Goal cases in each frame by default. A typical example is: Goal A needs an item, but gets the item It is necessary to perform the movement behavior B first and then the collection behavior C. After finding that the current Action is B, the AI will perform B. If we want AI to perform acquisition behavior C after B is completed, we should notify Planner to search again or search every frame after B is completed. If this option is checked, Planner will no longer search when it has an Action. You need to let the Action close itself actively, for example, make the Action in a state where the Precondition is not satisfied.

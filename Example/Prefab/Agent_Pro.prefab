@@ -137,3 +137,4 @@ MonoBehaviour:
   logType: 0
   tickType: 0
   skipSearchWhenActionRunning: 1
+  isActive: 1

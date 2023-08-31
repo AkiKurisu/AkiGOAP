@@ -1,24 +1,23 @@
 # AkiGOAP Example
 
-Example提供了一个简单的使用样例
+Example provides a simple usage example
 
-## 使用说明
+## Instructions for use
 
-其中Factory会生成批量Agent，这些Agent的目标Goal和行为Action已经定义在ExampleSet中。
+Among them, the Factory will generate batches of Agents, and the goals and actions of these Agents have been defined in the ExampleSet.
 
 ```
-目标1 跟随玩家：
-该目标需要Agent拥有能量，当距离小于指定范围后视作完成目标
-该目标优先级最高
+Goal 1 follows the player:
+This goal requires the Agent to have energy. When the distance is less than the specified range, the goal is considered to be completed
+This target has the highest priority
 
-目标2 恢复能量：
-该目标需要Agent没有能量
+Goal 2 restore energy:
+This goal requires the agent to have no energy
 ```
 
-1. 点击开始游戏后，场景内会生成指定数量的Agent，它们会先进入目标1跟随玩家并逐渐消耗能量
-2. 当能量消耗完后进入目标2，移动到Home或Tent，在休息一段时间后恢复满能量，重新进入目标1。
+1. After clicking to start the game, a specified number of Agents will be generated in the scene, and they will first enter the Goal 1 to follow the player and gradually consume energy
+2. Enter Goal 2 after the energy is exhausted, move to Home or Tent, recover full energy after a period of rest, and re-enter Goal 1.
 
 
-- 在Factory中你可以选择AgentPrefab，在Example/Prefab文件夹下有分别使用GOAPPlanner和GOAPPlannerPro的Agent Prefab。如果你不知道两者原理的区别，请阅读```README.md```文档。
-- 如果你使用GOAPPlannerPro版本的Agent Prefab, 这些Agent会额外在没有能量时结合位置信息，优先寻找最近的休息点，你可以移动Player来控制它们的行为。
-
+- In Factory, you can choose Agent Prefab, and there are Agent Prefabs using GOAPPlanner and GOAPPlannerPro respectively under the Example/Prefab folder. If you don't know the difference between the two principles, please read the ```README.md``` document.
+- If you use the Agent Prefab of the GOAPPlannerPro version, these Agents will additionally combine location information when there is no energy, and give priority to finding the nearest rest point, and you can move the Player to control their behavior.
