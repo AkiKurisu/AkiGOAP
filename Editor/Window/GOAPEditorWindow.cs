@@ -7,8 +7,8 @@ namespace Kurisu.GOAP.Editor
 {
     public class GOAPEditorWindow : EditorWindow
     {
-        private static readonly Dictionary<int,GOAPEditorWindow> cache = new Dictionary<int, GOAPEditorWindow>();
-        private UnityEngine.Object key { get; set; }
+        private static readonly Dictionary<int, GOAPEditorWindow> cache = new Dictionary<int, GOAPEditorWindow>();
+        private UnityEngine.Object Key { get; set; }
         private GOAPView graphView;
         public static void ShowEditorWindow(IGOAPSet set)
         {
@@ -18,21 +18,21 @@ namespace Kurisu.GOAP.Editor
                 cache[key].Focus();
                 return;
             }
-            var window = ScriptableObject.CreateInstance<GOAPEditorWindow>();
+            var window = CreateInstance<GOAPEditorWindow>();
             window.titleContent = new GUIContent($"GOAP Editor ({set._Object.name})");
             window.Show();
             window.Focus();
-            window.key = set._Object;
+            window.Key = set._Object;
             cache[key] = window;
             window.StructGraphView(set);
         }
         private void StructGraphView(IGOAPSet set)
         {
             rootVisualElement.Clear();
-            graphView=new GOAPView(this,set);
+            graphView = new GOAPView(this, set);
             graphView.Restore();
             rootVisualElement.Add(CreateToolBar(graphView));
-            rootVisualElement.Add(graphView); 
+            rootVisualElement.Add(graphView);
         }
         private VisualElement CreateToolBar(GOAPView graphView)
         {
@@ -41,15 +41,15 @@ namespace Kurisu.GOAP.Editor
                 {
                     GUILayout.BeginHorizontal(EditorStyles.toolbar);
 
-                    GUI.enabled=!Application.isPlaying;
+                    GUI.enabled = !Application.isPlaying;
                     if (GUILayout.Button($"Save", EditorStyles.toolbarButton))
                     {
                         var guiContent = new GUIContent();
                         graphView.Save();
                         guiContent.text = $"Update Succeed !";
-                        this.ShowNotification(guiContent);
+                        ShowNotification(guiContent);
                     }
-                    GUI.enabled=true;
+                    GUI.enabled = true;
                     GUILayout.FlexibleSpace();
                     GUILayout.EndHorizontal();
                 }
@@ -86,17 +86,17 @@ namespace Kurisu.GOAP.Editor
         }
         private void Reload()
         {
-            if (key != null)
+            if (Key != null)
             {
-                if(key is GameObject)StructGraphView((key as GameObject).GetComponent<IGOAPSet>());
-                else StructGraphView((key as IGOAPSet));
+                if (Key is GameObject) StructGraphView((Key as GameObject).GetComponent<IGOAPSet>());
+                else StructGraphView(Key as IGOAPSet);
                 Repaint();
             }
         }
         private void OnDestroy()
         {
-            int code=key.GetHashCode();
-            if (key != null && cache.ContainsKey(code))
+            int code = Key.GetHashCode();
+            if (Key != null && cache.ContainsKey(code))
             {
                 cache.Remove(code);
             }

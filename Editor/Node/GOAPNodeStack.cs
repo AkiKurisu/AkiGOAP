@@ -6,11 +6,25 @@ namespace Kurisu.GOAP.Editor
     {
         public GOAPNodeStack()
         {
-            capabilities&=~Capabilities.Copiable;
-            capabilities &=~Capabilities.Deletable;//不可删除
-            capabilities &=~Capabilities.Movable;//不可删除
-            headerContainer.style.flexDirection=FlexDirection.Row;
-            headerContainer.style.justifyContent=Justify.Center;
+            capabilities &= ~Capabilities.Copiable;
+            capabilities &= ~Capabilities.Deletable;
+            capabilities &= ~Capabilities.Movable;
+            headerContainer.style.flexDirection = FlexDirection.Row;
+            headerContainer.style.justifyContent = Justify.Center;
+        }
+    }
+    public class GOAPActionStack : GOAPNodeStack
+    {
+        protected override bool AcceptsElement(GraphElement element, ref int proposedIndex, int maxIndex)
+        {
+            return element is GOAPActionNode;
+        }
+    }
+    public class GOAPGoalStack : GOAPNodeStack
+    {
+        protected override bool AcceptsElement(GraphElement element, ref int proposedIndex, int maxIndex)
+        {
+            return element is GOAPGoalNode;
         }
     }
 }

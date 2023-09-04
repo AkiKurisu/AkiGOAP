@@ -26,15 +26,19 @@ namespace Kurisu.GOAP.Editor
             UIUtility.GetLabel("Normal Setting", 14, color: UIUtility.AkiBlue, anchor: TextAnchor.MiddleLeft).AddTo(myInspector);
             myInspector.Q<PropertyField>("PropertyField:logType").MoveToEnd(myInspector);
             myInspector.Q<PropertyField>("PropertyField:tickType").MoveToEnd(myInspector);
-            var isActive = new Toggle("Is Active");
-            isActive.tooltip = SkilSearchTooltip;
+            var isActive = new Toggle("Is Active")
+            {
+                tooltip = SkilSearchTooltip
+            };
             isActive.BindProperty(serializedObject.FindProperty("isActive"));
             isActive.AddTo(myInspector);
             myInspector.AddSpace();
             UIUtility.GetLabel("Pro Setting", 14, color: UIUtility.AkiBlue, anchor: TextAnchor.MiddleLeft).AddTo(myInspector);
             var skipSearchProperty = serializedObject.FindProperty("skipSearchWhenActionRunning");
-            var skipSearchToggle = new Toggle("Skip Search When Action Running");
-            skipSearchToggle.tooltip = SkilSearchTooltip;
+            var skipSearchToggle = new Toggle("Skip Search When Action Running")
+            {
+                tooltip = SkilSearchTooltip
+            };
             skipSearchToggle.BindProperty(skipSearchProperty);
             skipSearchToggle.AddTo(myInspector);
             //SnapShot
