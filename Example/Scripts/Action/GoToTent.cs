@@ -22,7 +22,7 @@ namespace Kurisu.GOAP.Example
         {
             agent.NavMeshAgent.SetDestination(agent.Tent.position);
             //You can make a trigger to set state or other method based on unity engine lifetime scope
-            worldState.SetState("CanRest", Vector3.SqrMagnitude(agent._Transform.position - agent.Tent.position) < 1);
+            worldState.SetState("CanRest", Vector3.SqrMagnitude(agent.Transform.position - agent.Tent.position) < 1);
         }
     }
 }

@@ -13,7 +13,7 @@ namespace Kurisu.GOAP.Editor
         private const string IsActiveTooltip = "Whether current planner is active, will be disbled automatically" +
         " when skipSearchWhenActionRunning is on";
         private const string SkilSearchTooltip = "Enabled to skip search plan when already have an action, enable this will need you to set correct precondition" +
-        "for each action to let it quit by itself";
+        " for each action to let it quit by itself";
         public override VisualElement CreateInspectorGUI()
         {
             var myInspector = new VisualElement();

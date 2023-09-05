@@ -4,19 +4,19 @@ namespace Kurisu.GOAP.Editor
 {
     public class GOAPActionNode : GOAPNode
     {
-        public GOAPActionNode():base()
+        public GOAPActionNode() : base()
         {
-            label.style.color=Color.black;
+            label.style.color = Color.black;
         }
-        private readonly Label label=new Label();
+        private readonly Label label = new();
         protected sealed override void OnCleanUp()
         {
             titleContainer.Remove(label);
         }
         public void SetUp(float cost)
         {
-            style.backgroundColor=Color.green;
-            label.text=$"Cost : {cost}";
+            style.backgroundColor = Color.green;
+            label.text = $"Cost : {cost}";
             titleContainer.Add(label);
         }
     }

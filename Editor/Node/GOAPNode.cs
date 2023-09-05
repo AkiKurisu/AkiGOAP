@@ -7,15 +7,14 @@ using UnityEngine;
 using UnityEngine.UIElements;
 namespace Kurisu.GOAP.Editor
 {
-    public abstract class GOAPNode : UnityEditor.Experimental.GraphView.Node
+    public abstract class GOAPNode : Node
     {
-        private GOAPView bindView;
-        public GOAPBehavior NodeBehavior {private set;get; }
-        public string GUID{get;protected set;}
-        private Type dirtyNodeBehaviorType;        
+        public GOAPBehavior NodeBehavior { private set; get; }
+        public string GUID { get; protected set; }
+        private Type dirtyNodeBehaviorType;
         private readonly VisualElement container;
         private readonly TextField description;
-        public string Description=>description.value;
+        public string Description => description.value;
         private readonly FieldResolverFactory fieldResolverFactory;
         public readonly List<IFieldResolver> resolvers = new List<IFieldResolver>();
         public Action<GOAPNode> onSelectAction;
@@ -24,13 +23,13 @@ namespace Kurisu.GOAP.Editor
             base.OnSelected();
             onSelectAction?.Invoke(this);
         }
-        
+
         protected GOAPNode()
         {
             fieldResolverFactory = FieldResolverFactory.Instance;
             container = new VisualElement();
             description = new TextField();
-            GUID=Guid.NewGuid().ToString();
+            GUID = Guid.NewGuid().ToString();
             Initialize();
         }
 
@@ -51,7 +50,7 @@ namespace Kurisu.GOAP.Editor
             NodeBehavior = action;
             resolvers.ForEach(e => e.Restore(NodeBehavior));
             description.value = NodeBehavior.description;
-            GUID=string.IsNullOrEmpty(action.GUID)?Guid.NewGuid().ToString():action.GUID;
+            GUID = string.IsNullOrEmpty(action.GUID) ? Guid.NewGuid().ToString() : action.GUID;
         }
         private GOAPBehavior ReplaceBehavior()
         {
@@ -62,17 +61,16 @@ namespace Kurisu.GOAP.Editor
         {
             return dirtyNodeBehaviorType;
         }
-            
+
         public void Commit()
         {
             ReplaceBehavior();
-            resolvers.ForEach( r => r.Commit(NodeBehavior));
-            NodeBehavior.description = this.description.value;
-            NodeBehavior.GUID=this.GUID;
+            resolvers.ForEach(r => r.Commit(NodeBehavior));
+            NodeBehavior.description = description.value;
+            NodeBehavior.GUID = GUID;
         }
-        public void SetBehavior(System.Type nodeBehavior,GOAPView view)
+        public void SetBehavior(Type nodeBehavior, GOAPView view)
         {
-            this.bindView=view;
             if (dirtyNodeBehaviorType != null)
             {
                 dirtyNodeBehaviorType = null;
@@ -94,13 +92,13 @@ namespace Kurisu.GOAP.Editor
                     container.Add(fieldResolver.GetEditorField());
                     resolvers.Add(fieldResolver);
                 });
-            var label=nodeBehavior.GetCustomAttribute(typeof(GOAPLabelAttribute), false) as GOAPLabelAttribute;
-            title = label?.Title??nodeBehavior.Name;
-            if(view.Set is IPlanner)
+            var label = nodeBehavior.GetCustomAttribute(typeof(GOAPLabelAttribute), false) as GOAPLabelAttribute;
+            title = label?.Title ?? nodeBehavior.Name;
+            if (view.Set is IPlanner)
             {
-                capabilities&=~Capabilities.Copiable;
-                capabilities &=~Capabilities.Deletable;
-                capabilities &=~Capabilities.Movable;
+                capabilities &= ~Capabilities.Copiable;
+                capabilities &= ~Capabilities.Deletable;
+                capabilities &= ~Capabilities.Movable;
             }
         }
 
@@ -117,7 +115,7 @@ namespace Kurisu.GOAP.Editor
         {
             style.backgroundColor = new StyleColor(StyleKeyword.Null);
         }
-        protected virtual void OnCleanUp(){}
+        protected virtual void OnCleanUp() { }
 
     }
 }

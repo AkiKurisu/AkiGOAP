@@ -9,34 +9,36 @@ namespace Kurisu.GOAP.Example
     {
         public ExampleAgent(GOAPSet dataSet)
         {
-            this.dataSet=dataSet;
+            this.dataSet = dataSet;
         }
-        public Transform _Transform{get;set;}
-        public NavMeshAgent NavMeshAgent{get;private set;}
+        public Transform Transform { get; set; }
+        public NavMeshAgent NavMeshAgent { get; private set; }
         private readonly GOAPSet dataSet;
-        public Transform Player{get;internal set;}
-        public Transform Home{get;internal set;}
-        public Transform Tent{get;internal set;}
-        public int Energy=100;
-        public void Init() {
+        public Transform Player { get; internal set; }
+        public Transform Home { get; internal set; }
+        public Transform Tent { get; internal set; }
+        public int Energy = 100;
+        public void Init()
+        {
             //Inject dependency
-            NavMeshAgent=_Transform.GetComponent<NavMeshAgent>();
-            var goals=dataSet.GetGoals();
-            foreach(var goal in goals.OfType<ExampleGoal>())
+            NavMeshAgent = Transform.GetComponent<NavMeshAgent>();
+            var goals = dataSet.GetGoals();
+            foreach (var goal in goals.OfType<ExampleGoal>())
             {
                 goal.Inject(this);
             }
-            var actions=dataSet.GetActions();
-            foreach(var action in actions.OfType<ExampleAction>())
+            var actions = dataSet.GetActions();
+            foreach (var action in actions.OfType<ExampleAction>())
             {
                 action.Inject(this);
             }
-            var planner=_Transform.GetComponent<IPlanner>();
+            var planner = Transform.GetComponent<IPlanner>();
             planner.InjectGoals(goals);
             planner.InjectActions(actions);
         }
-        public void LossEnergy() {
-            Energy=Mathf.Clamp(Energy-1,0,100);
+        public void LossEnergy()
+        {
+            Energy = Mathf.Clamp(Energy - 1, 0, 100);
         }
     }
 }

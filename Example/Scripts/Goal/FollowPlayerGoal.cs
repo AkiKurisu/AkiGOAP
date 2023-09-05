@@ -19,7 +19,7 @@ namespace Kurisu.GOAP.Example
         public sealed override void OnTick()
         {
             //If distance * distance is smaller than 4, set 'InDistance' to true
-            worldState.SetState("InDistance", Vector3.SqrMagnitude(agent._Transform.position - agent.Player.position) < distance);
+            worldState.SetState("InDistance", Vector3.SqrMagnitude(agent.Transform.position - agent.Player.position) < distance);
         }
     }
 }

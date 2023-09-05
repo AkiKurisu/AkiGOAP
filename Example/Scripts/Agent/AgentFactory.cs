@@ -24,7 +24,7 @@ namespace Kurisu.GOAP.Example
                 var prefab = Instantiate(agentPrefab, GetRandomPosition(), Quaternion.identity);
                 agents[i] = new ExampleAgent(dataSet)
                 {
-                    _Transform = prefab.transform,
+                    Transform = prefab.transform,
                     Home = home,
                     Tent = tent,
                     Player = player

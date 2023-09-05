@@ -51,10 +51,10 @@ namespace Kurisu.GOAP.Editor
 
         private readonly List<PlanCache> planeCaches = new List<PlanCache>();
         private int currentIndex;
-        private List<GoalData> goalData => planeCaches[currentIndex].goalData;
-        private List<IAction> activePlan => planeCaches[currentIndex].activePlan;
-        private IGoal activeGoal => planeCaches[currentIndex].activeGoal;
-        private int activeActionIdx => planeCaches[currentIndex].activeActionIdx;
+        private List<GoalData> GoalData => planeCaches[currentIndex].goalData;
+        private List<IAction> ActivePlan => planeCaches[currentIndex].activePlan;
+        private IGoal ActiveGoal => planeCaches[currentIndex].activeGoal;
+        private int ActiveActionIdx => planeCaches[currentIndex].activeActionIdx;
         private class PlanCache
         {
             public IGoal activeGoal;
@@ -64,7 +64,7 @@ namespace Kurisu.GOAP.Editor
         }
         public static void Show(IPlanner planner)
         {
-            var window = GOAPPlannerSnapshotEditorWindow.GetWindow<GOAPPlannerSnapshotEditorWindow>("GOAP Planner Snapshot");
+            var window = GetWindow<GOAPPlannerSnapshotEditorWindow>("GOAP Planner Snapshot");
             window.SetUp(planner);
             window.Show();
         }
@@ -159,9 +159,9 @@ namespace Kurisu.GOAP.Editor
                 planeCaches.Add(new PlanCache
                 {
                     activeGoal = planner.ActivateGoal,
-                    goalData = (planner as IPlanner).GetSortedGoalData(),
+                    goalData = planner.GetSortedGoalData(),
                     activePlan = new List<IAction>(planner.ActivatePlan),
-                    activeActionIdx = (planner as IPlanner).ActiveActionIndex
+                    activeActionIdx = planner.ActiveActionIndex
                 });
                 if (planeCaches.Count > 50) planeCaches.RemoveAt(0);
             }
@@ -275,17 +275,17 @@ namespace Kurisu.GOAP.Editor
             GUILayout.Label("\n\n");
             GUI.color = runningTint;
             GUI.backgroundColor = backgroundNodeColor;
-            for (int i = 0; i < goalData.Count; i++)
+            for (int i = 0; i < GoalData.Count; i++)
             {
                 GUI.Box(
                     new Rect(
                         0,
                         30f + i * prioritySpacing,
-                        Mathf.Clamp(goalData[i].priority, 0.05f, 1f) * maxPriorityRectWidth,
+                        Mathf.Clamp(GoalData[i].priority, 0.05f, 1f) * maxPriorityRectWidth,
                         priorityRectHeight
                     ),
-                    goalData[i].goalName,
-                    goalData[i].canRun ? goalLabelStyle : disabledGoalLabelStyle
+                    GoalData[i].goalName,
+                    GoalData[i].canRun ? goalLabelStyle : disabledGoalLabelStyle
                 );
             }
 
@@ -298,7 +298,7 @@ namespace Kurisu.GOAP.Editor
         {
             if (planeCaches.Count == 0) return;
             int count = 0;
-            for (int i = 0; i < activePlan.Count; i++)
+            for (int i = 0; i < ActivePlan.Count; i++)
             {
 
                 // Draw link
@@ -313,7 +313,7 @@ namespace Kurisu.GOAP.Editor
 
                 GUI.color = defaultTint;
                 GUI.backgroundColor = backgroundNodeColor;
-                if (i == activeActionIdx)
+                if (i == ActiveActionIdx)
                 {
                     GUI.color = runningTint;
                     activeNodeStyle = selectedNodeStyle;
@@ -328,7 +328,7 @@ namespace Kurisu.GOAP.Editor
                     "",
                     activeNodeStyle);
 
-                actionContent.text = "\nAction\n\n" + activePlan[i].Name;
+                actionContent.text = "\nAction\n\n" + ActivePlan[i].Name;
 
                 // Draw task rect
                 GUI.backgroundColor = actionColor;
@@ -353,7 +353,7 @@ namespace Kurisu.GOAP.Editor
                 "",
                 selectedNodeStyle);
             GUI.backgroundColor = goalColor;
-            goalContent.text = "\nGoal\n\n" + activeGoal.Name;
+            goalContent.text = "\nGoal\n\n" + ActiveGoal.Name;
             GUI.Box(
                 GetTaskRect(count),
                 goalContent,
@@ -394,12 +394,12 @@ namespace Kurisu.GOAP.Editor
             float thickness = 4f)
         {
 
-            Vector2 startPos = new Vector2(
+            Vector2 startPos = new(
                 startGridPos * nodeSpacing.x + nodeSize.x,
                 activePlanHeight + nodeSize.y * .5f
             );
 
-            Vector2 endPos = new Vector2(
+            Vector2 endPos = new(
                 endGridPos * nodeSpacing.x,
                 activePlanHeight + nodeSize.y * .5f
             );

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -44,13 +45,27 @@ namespace Kurisu.GOAP.Editor
                     GUI.enabled = !Application.isPlaying;
                     if (GUILayout.Button($"Save", EditorStyles.toolbarButton))
                     {
-                        var guiContent = new GUIContent();
                         graphView.Save();
-                        guiContent.text = $"Update Succeed !";
-                        ShowNotification(guiContent);
+                        ShowNotification(new GUIContent("Update Succeed !"));
                     }
                     GUI.enabled = true;
                     GUILayout.FlexibleSpace();
+                    if (GUILayout.Button($"Save To Json", EditorStyles.toolbarButton))
+                    {
+                        string path = EditorUtility.SaveFilePanel("Select json file save path", Application.dataPath, graphView.Set.Object.name, "json");
+                        if (!string.IsNullOrEmpty(path))
+                        {
+                            var template = CreateInstance<GOAPSet>();
+                            template.Behaviors.AddRange(graphView.Set.Behaviors);
+                            var serializedData = JsonUtility.ToJson(template);
+                            FileInfo info = new(path);
+                            File.WriteAllText(path, serializedData);
+                            ShowNotification(new GUIContent("Save to json file succeed !"));
+                            AssetDatabase.SaveAssets();
+                            AssetDatabase.Refresh();
+                        }
+                        GUIUtility.ExitGUI();
+                    }
                     GUILayout.EndHorizontal();
                 }
             );

@@ -27,14 +27,11 @@ namespace Kurisu.GOAP.Editor
             styleSheets.Add(Resources.Load<StyleSheet>(GraphStyleSheetPath));
             SetupZoom(ContentZoomer.DefaultMinScale, ContentZoomer.DefaultMaxScale);
             Insert(0, new GridBackground());
-
             var contentDragger = new ContentDragger();
-            //鼠标中键移动
             contentDragger.activators.Add(new ManipulatorActivationFilter()
             {
                 button = MouseButton.MiddleMouse,
             });
-            // 添加选框
             this.AddManipulator(new SelectionDragger());
             this.AddManipulator(new RectangleSelector());
             this.AddManipulator(new FreehandSelector());
@@ -73,11 +70,11 @@ namespace Kurisu.GOAP.Editor
             base.BuildContextualMenu(evt);
             var remainTargets = evt.menu.MenuItems().FindAll(e =>
             {
-                switch (e)
+                return e switch
                 {
-                    case DropdownMenuAction a: return a.name == "Create Node" || a.name == "Delete";
-                    default: return false;
-                }
+                    DropdownMenuAction a => a.name == "Create Node" || a.name == "Delete",
+                    _ => false,
+                };
             });
             //Remove needless default actions .
             evt.menu.MenuItems().Clear();
