@@ -5,7 +5,7 @@ namespace Kurisu.GOAP.Resolver
 {
     public interface INode
     {
-        GOAPState[] Effects { get; }
-        GOAPState[] Conditions { get; }
+        GOAPState[] EffectStates { get; }
+        GOAPState[] ConditionStates { get; }
     }
 }

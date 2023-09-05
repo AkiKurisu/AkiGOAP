@@ -19,8 +19,8 @@ namespace Kurisu.GOAP.Editor
 
         // Active plan node params
         private Vector2 nodeSpacing;
-        private Vector2 nodeSize; 
-        private Vector2 taskNodeSize;  
+        private Vector2 nodeSize;
+        private Vector2 taskNodeSize;
 
         // Styles
         private GUIStyle guiNodeStyle;
@@ -48,13 +48,13 @@ namespace Kurisu.GOAP.Editor
         private Color defaultTint;
         private Color linkColor;
         private Color panelColor;
-        
-        private readonly List<PlanCache> planeCaches=new List<PlanCache>();
+
+        private readonly List<PlanCache> planeCaches = new List<PlanCache>();
         private int currentIndex;
-        private List<GoalData> goalData=>planeCaches[currentIndex].goalData;
-        private List<IAction> activePlan=>planeCaches[currentIndex].activePlan;
-        private IGoal activeGoal=>planeCaches[currentIndex].activeGoal;
-        private int activeActionIdx=>planeCaches[currentIndex].activeActionIdx;
+        private List<GoalData> goalData => planeCaches[currentIndex].goalData;
+        private List<IAction> activePlan => planeCaches[currentIndex].activePlan;
+        private IGoal activeGoal => planeCaches[currentIndex].activeGoal;
+        private int activeActionIdx => planeCaches[currentIndex].activeActionIdx;
         private class PlanCache
         {
             public IGoal activeGoal;
@@ -62,8 +62,9 @@ namespace Kurisu.GOAP.Editor
             public List<IAction> activePlan;
             public int activeActionIdx;
         }
-        public static void Show(IPlanner planner){
-            var window=GOAPPlannerSnapshotEditorWindow.GetWindow<GOAPPlannerSnapshotEditorWindow>("GOAP Planner Snapshot");
+        public static void Show(IPlanner planner)
+        {
+            var window = GOAPPlannerSnapshotEditorWindow.GetWindow<GOAPPlannerSnapshotEditorWindow>("GOAP Planner Snapshot");
             window.SetUp(planner);
             window.Show();
         }
@@ -78,34 +79,38 @@ namespace Kurisu.GOAP.Editor
         }
         public void SetUp(IPlanner planner)
         {
-            this.planner=planner;
-            planner.OnUpdatePlanEvent+=CachePlan;
+            this.planner = planner;
+            planner.OnUpdatePlanEvent += CachePlan;
         }
-        private void OnDestroy() {
-            planner.OnUpdatePlanEvent-=CachePlan;
+        private void OnDestroy()
+        {
+            planner.OnUpdatePlanEvent -= CachePlan;
         }
-        private void SetupPanels(){
+        private void SetupPanels()
+        {
             activePlanPanel = new Rect(
                 0,
                 0,
                 position.width,
-                position.height*.4f
+                position.height * .4f
             );
             goalPrioritiesPanel = new Rect(
                 0,
-                position.height*.4f,
+                position.height * .4f,
                 position.width,
                 position.height
             );
         }
 
-        private void SetupActivePlanNodeParams(){
+        private void SetupActivePlanNodeParams()
+        {
             nodeSpacing = GUIProperties.NodeSpacing();
             nodeSize = GUIProperties.NodeSize();
             taskNodeSize = GUIProperties.TaskNodeSize();
         }
 
-        private void SetupGUIStyles(){
+        private void SetupGUIStyles()
+        {
             guiNodeStyle = GUIProperties.GUINodeStyle();
             selectedNodeStyle = GUIProperties.SelectedGUINodeStyle();
             activeNodeStyle = guiNodeStyle;
@@ -114,7 +119,8 @@ namespace Kurisu.GOAP.Editor
             disabledGoalLabelStyle = GUIProperties.DisabledGoalLabelStyle();
         }
 
-        private void SetupColors(){
+        private void SetupColors()
+        {
             backgroundNodeColor = GUIProperties.BackgroundNodeColor();
             actionColor = GUIProperties.ActionColor();
             goalColor = GUIProperties.GoalColor();
@@ -123,14 +129,17 @@ namespace Kurisu.GOAP.Editor
             linkColor = GUIProperties.LinkColor();
             panelColor = GUIProperties.PanelColor();
         }
-        private void SetupGUIContent(){
+        private void SetupGUIContent()
+        {
             actionContent = GUIProperties.ActionContent();
             goalContent = GUIProperties.GoalContent();
         }
-        private void SetupGoalPriorities(){
+        private void SetupGoalPriorities()
+        {
             maxPriorityRectWidth = position.width - 10f;
         }
-        private void OnEnable(){
+        private void OnEnable()
+        {
             SetupPanels();
             SetupActivePlanNodeParams();
             SetupGUIStyles();
@@ -149,19 +158,20 @@ namespace Kurisu.GOAP.Editor
             {
                 planeCaches.Add(new PlanCache
                 {
-                    activeGoal=planner.ActivateGoal,
+                    activeGoal = planner.ActivateGoal,
                     goalData = (planner as IPlanner).GetSortedGoalData(),
-                    activePlan =new List<IAction>(planner.ActivatePlan),
-                    activeActionIdx = (planner as IPlanner).activeActionIndex
+                    activePlan = new List<IAction>(planner.ActivatePlan),
+                    activeActionIdx = (planner as IPlanner).ActiveActionIndex
                 });
-                if(planeCaches.Count>50)planeCaches.RemoveAt(0);
+                if (planeCaches.Count > 50) planeCaches.RemoveAt(0);
             }
             Repaint();
         }
-        private void OnGUI(){
+        private void OnGUI()
+        {
             DrawGrid(20, 0.2f, Color.gray);
             DrawGrid(100, 0.4f, Color.gray);
-            
+
             DrawActivePlanPanel();
             DrawGoalPrioritiesPanel();
             DrawToolBar();
@@ -172,40 +182,41 @@ namespace Kurisu.GOAP.Editor
             {
                 GUILayout.BeginHorizontal();
                 GUILayout.FlexibleSpace();
-                GUI.enabled=planeCaches.Count!=0;
+                GUI.enabled = planeCaches.Count != 0;
                 if (GUILayout.Button("Last", GUILayout.MinWidth(100)))
                 {
                     currentIndex--;
-                    if(currentIndex<0)currentIndex=planeCaches.Count-1;
+                    if (currentIndex < 0) currentIndex = planeCaches.Count - 1;
                     Repaint();
                 }
-                int total=Mathf.Max(1,planeCaches.Count);
-                GUILayout.TextField($"Cache:{currentIndex+1}/{total}");
+                int total = Mathf.Max(1, planeCaches.Count);
+                GUILayout.TextField($"Cache:{currentIndex + 1}/{total}");
                 if (GUILayout.Button("Next", GUILayout.MinWidth(100)))
                 {
                     currentIndex++;
-                    if(currentIndex>=planeCaches.Count)currentIndex=0;
+                    if (currentIndex >= planeCaches.Count) currentIndex = 0;
                     Repaint();
                 }
                 if (GUILayout.Button("Clear", GUILayout.MinWidth(100)))
                 {
-                    currentIndex=0;
+                    currentIndex = 0;
                     planeCaches.Clear();
                     Repaint();
                 }
-                GUI.enabled=true;
+                GUI.enabled = true;
                 GUILayout.EndHorizontal();
             }
             GUILayout.EndVertical();
         }
-        private void DrawActivePlanPanel(){
+        private void DrawActivePlanPanel()
+        {
             GUI.color = runningTint;
             GUI.backgroundColor = panelColor;
             activePlanPanel = new Rect(
                 0,
                 0,
                 position.width,
-                position.height*.4f
+                position.height * .4f
             );
             BeginWindows();
             activePlanPanel = GUILayout.Window(
@@ -218,12 +229,13 @@ namespace Kurisu.GOAP.Editor
             EndWindows();
         }
 
-        private void DrawGoalPrioritiesPanel(){
+        private void DrawGoalPrioritiesPanel()
+        {
             GUI.color = runningTint;
             GUI.backgroundColor = panelColor;
             goalPrioritiesPanel = new Rect(
                 0,
-                position.height*.3f,
+                position.height * .3f,
                 position.width,
                 position.height
             );
@@ -239,15 +251,17 @@ namespace Kurisu.GOAP.Editor
         }
 
 
-        private bool IsActive(){
+        private bool IsActive()
+        {
             return (
-                planner != null 
-                && planner.ActivatePlan != null 
-                && planner.ActivatePlan.Count>0
+                planner != null
+                && planner.ActivatePlan != null
+                && planner.ActivatePlan.Count > 0
             );
         }
 
-        private void DrawActivePlan(int unusedWindowID){
+        private void DrawActivePlan(int unusedWindowID)
+        {
             DrawActionNodes(unusedWindowID);
         }
         /// <summary>
@@ -255,21 +269,23 @@ namespace Kurisu.GOAP.Editor
         /// visualised as a progress bar 
         /// </summary>
         /// <param name="unusedWindowID"></param>
-        private void DrawGoalPriorities(int unusedWindowID){
-            if(planeCaches.Count==0)return;
+        private void DrawGoalPriorities(int unusedWindowID)
+        {
+            if (planeCaches.Count == 0) return;
             GUILayout.Label("\n\n");
             GUI.color = runningTint;
             GUI.backgroundColor = backgroundNodeColor;
-            for(int i=0; i<goalData.Count; i++){
+            for (int i = 0; i < goalData.Count; i++)
+            {
                 GUI.Box(
                     new Rect(
                         0,
-                        30f + i*prioritySpacing,
+                        30f + i * prioritySpacing,
                         Mathf.Clamp(goalData[i].priority, 0.05f, 1f) * maxPriorityRectWidth,
                         priorityRectHeight
                     ),
                     goalData[i].goalName,
-                    goalData[i].canRun?goalLabelStyle:disabledGoalLabelStyle
+                    goalData[i].canRun ? goalLabelStyle : disabledGoalLabelStyle
                 );
             }
 
@@ -278,15 +294,18 @@ namespace Kurisu.GOAP.Editor
         /// Draws an action plan as a series of labelled Rects linked together
         /// </summary>
         /// <param name="unusedWindowID"></param>
-        private void DrawActionNodes(int unusedWindowID){
-            if(planeCaches.Count==0)return;
+        private void DrawActionNodes(int unusedWindowID)
+        {
+            if (planeCaches.Count == 0) return;
             int count = 0;
-            for (int i = 0; i < activePlan.Count; i++){
+            for (int i = 0; i < activePlan.Count; i++)
+            {
 
                 // Draw link
-                if (count > 0){
+                if (count > 0)
+                {
                     DrawLink(
-                        count-1, 
+                        count - 1,
                         count,
                         linkColor
                     );
@@ -294,16 +313,18 @@ namespace Kurisu.GOAP.Editor
 
                 GUI.color = defaultTint;
                 GUI.backgroundColor = backgroundNodeColor;
-                if (i==activeActionIdx){
+                if (i == activeActionIdx)
+                {
                     GUI.color = runningTint;
                     activeNodeStyle = selectedNodeStyle;
                 }
-                else{
+                else
+                {
                     activeNodeStyle = guiNodeStyle;
                 }
                 // Draw node rect
                 GUI.Box(
-                    GetNodeRect(count), 
+                    GetNodeRect(count),
                     "",
                     activeNodeStyle);
 
@@ -312,8 +333,8 @@ namespace Kurisu.GOAP.Editor
                 // Draw task rect
                 GUI.backgroundColor = actionColor;
                 GUI.Box(
-                    GetTaskRect(count), 
-                    actionContent, 
+                    GetTaskRect(count),
+                    actionContent,
                     activeNodeStyle);
 
                 count++;
@@ -321,26 +342,27 @@ namespace Kurisu.GOAP.Editor
 
             // Draw goal
             DrawLink(
-                count-1, 
+                count - 1,
                 count,
                 linkColor
             );
             GUI.color = runningTint;
             GUI.backgroundColor = backgroundNodeColor;
             GUI.Box(
-                GetNodeRect(count), 
+                GetNodeRect(count),
                 "",
                 selectedNodeStyle);
             GUI.backgroundColor = goalColor;
-            goalContent.text = "\nGoal\n\n" +activeGoal.Name;
+            goalContent.text = "\nGoal\n\n" + activeGoal.Name;
             GUI.Box(
-                GetTaskRect(count), 
-                goalContent, 
+                GetTaskRect(count),
+                goalContent,
                 selectedNodeStyle);
         }
 
 
-        private Rect GetNodeRect(int gridPos){
+        private Rect GetNodeRect(int gridPos)
+        {
             return new Rect(
                 gridPos * nodeSpacing.x,
                 activePlanHeight,
@@ -349,10 +371,11 @@ namespace Kurisu.GOAP.Editor
             );
         }
 
-        private Rect GetTaskRect(int gridPos){
+        private Rect GetTaskRect(int gridPos)
+        {
             return new Rect(
                 gridPos * nodeSpacing.x,
-                activePlanHeight + taskNodeSize.y*.05f,
+                activePlanHeight + taskNodeSize.y * .05f,
                 taskNodeSize.x,
                 taskNodeSize.y
             );
@@ -365,19 +388,20 @@ namespace Kurisu.GOAP.Editor
         /// <param name="color"></param>
         /// <param name="thickness"></param>
         private void DrawLink(
-            int startGridPos, 
-            int endGridPos, 
+            int startGridPos,
+            int endGridPos,
             Color color,
-            float thickness=4f){
+            float thickness = 4f)
+        {
 
             Vector2 startPos = new Vector2(
                 startGridPos * nodeSpacing.x + nodeSize.x,
-                activePlanHeight + nodeSize.y*.5f
+                activePlanHeight + nodeSize.y * .5f
             );
 
             Vector2 endPos = new Vector2(
                 endGridPos * nodeSpacing.x,
-                activePlanHeight + nodeSize.y*.5f
+                activePlanHeight + nodeSize.y * .5f
             );
 
             Handles.DrawBezier(
@@ -407,7 +431,7 @@ namespace Kurisu.GOAP.Editor
             for (int i = 0; i < widthDivs; i++)
             {
                 Handles.DrawLine(
-                    new Vector3(gridSpacing * i, -gridSpacing, 0), 
+                    new Vector3(gridSpacing * i, -gridSpacing, 0),
                     new Vector3(gridSpacing * i, position.height, 0f)
                 );
             }

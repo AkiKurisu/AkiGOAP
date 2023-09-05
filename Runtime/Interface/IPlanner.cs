@@ -10,7 +10,7 @@ namespace Kurisu.GOAP
         List<IAction> GetAllActions();
         event System.Action<IPlanner> OnUpdatePlanEvent;
         GOAPWorldState WorldState { get; }
-        int activeActionIndex { get; }
+        int ActiveActionIndex { get; }
         List<GoalData> GetSortedGoalData();
         void TickGoals();
         void ManualActivate();

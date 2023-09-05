@@ -6,58 +6,60 @@ namespace Kurisu.GOAP
     /// A behavior that requires preconditions to run and has known 
     /// effects upon completion.
     /// </summary>
-    public abstract class GOAPAction : GOAPBehavior,IAction
+    public abstract class GOAPAction : GOAPBehavior, IAction
     {
         protected GOAPWorldState worldState;
         // All of these states are removed from worldState when OnDeactivate is called
-        private Dictionary<string, bool > temporaryState; 
+        private Dictionary<string, bool> temporaryState;
 
         // What must be in worldState for the action to run
-        public Dictionary<string, bool> preconditions{get; protected set;}  = new Dictionary<string, bool>();
+        public Dictionary<string, bool> Preconditions { get; protected set; } = new Dictionary<string, bool>();
         // What will be in worldState when action completed
-        public Dictionary<string, bool> effects{get; protected set;} = new Dictionary<string, bool>();
+        public Dictionary<string, bool> Effects { get; protected set; } = new Dictionary<string, bool>();
 
         // Absent key treated the same as key = false in preconditions and effects
-        protected virtual bool DefaultFalse => true; 
-        public virtual string Name=>GetType().Name;
+        protected virtual bool DefaultFalse => true;
+        public virtual string Name => GetType().Name;
         private GOAPState[] _effects;
-        public GOAPState[] Effects 
+        public GOAPState[] EffectStates
         {
             get
             {
-                if(DynamicSetEffect)
+                if (DynamicSetEffect)
                 {
-                    effects.Clear();
+                    Effects.Clear();
                     SetupEffects();
-                    _effects= effects.Select(x=>new GOAPState(x)).ToArray();
+                    _effects = Effects.Select(x => new GOAPState(x)).ToArray();
                 }
                 return _effects;
             }
             set
             {
-                _effects=value;
+                _effects = value;
             }
         }
-        public GOAPState[] Conditions {get;private set;}
+        public GOAPState[] ConditionStates { get; private set; }
         /// <summary>
         /// Whether effect of this action can be set dynamically at runtime
         /// </summary>
-        protected virtual bool DynamicSetEffect=>false;
+        protected virtual bool DynamicSetEffect => false;
         void IAction.Init(GOAPWorldState worldState)
         {
-            this.worldState =worldState;
+            this.worldState = worldState;
             SetupDerived();
             SetupEffects();
-            if(!DynamicSetEffect)Effects= effects.Select(x=>new GOAPState(x)).ToArray();
-            Conditions = preconditions.Select(x=>new GOAPState(x)).ToArray();
+            if (!DynamicSetEffect) EffectStates = Effects.Select(x => new GOAPState(x)).ToArray();
+            ConditionStates = Preconditions.Select(x => new GOAPState(x)).ToArray();
             ResetTemporaryState();
         }
 
-        private void ResetTemporaryState(){
-            temporaryState = new Dictionary<string, bool >();
+        private void ResetTemporaryState()
+        {
+            temporaryState = new Dictionary<string, bool>();
         }
 
-        public virtual float GetCost(){
+        public virtual float GetCost()
+        {
             return 0f;
         }
         /// <summary>
@@ -67,18 +69,21 @@ namespace Kurisu.GOAP
         /// <returns></returns>
         public bool SatisfiesConditions(Dictionary<string, bool> conditions)
         {
-            if(DynamicSetEffect)
+            if (DynamicSetEffect)
             {
-                effects.Clear();
+                Effects.Clear();
                 SetupEffects();
             }
-            foreach(var i in conditions){
+            foreach (var i in conditions)
+            {
                 //If condition not in the effects
-                if (!effects.ContainsKey(i.Key)){
-                    if(DefaultFalse && i.Value==false)continue;
+                if (!Effects.ContainsKey(i.Key))
+                {
+                    if (DefaultFalse && i.Value == false) continue;
                     else return false;
                 }
-                if (effects[i.Key] != i.Value){
+                if (Effects[i.Key] != i.Value)
+                {
                     return false;
                 }
             }
@@ -87,47 +92,53 @@ namespace Kurisu.GOAP
         /// <summary>
         /// Called when selected by GOAPPlanner
         /// </summary>
-        public void OnActivate(){
+        public void OnActivate()
+        {
             OnActivateDerived();
         }
 
-        protected virtual void OnActivateDerived(){}
+        protected virtual void OnActivateDerived() { }
         /// <summary>
         /// Called by GOAPPlanner when action effects achieved or plan cancelled
         /// </summary>
-        public void OnDeactivate(){
+        public void OnDeactivate()
+        {
             OnDeactivateDerived();
             ClearTemporaryStates();
         }
 
-        protected virtual void OnDeactivateDerived(){}
+        protected virtual void OnDeactivateDerived() { }
         /// <summary>
         /// Called every frame by GOAPPlanner
         /// </summary>
-        public virtual void OnTick(){}
+        public virtual void OnTick() { }
         /// <summary>
         /// True if worldState is a superset of preconditions
         /// </summary>
         /// <param name="worldState"></param>
         /// <returns></returns>
-        public bool PreconditionsSatisfied(GOAPWorldState worldState){
-            return(worldState.IsSubset(preconditions));
+        public bool PreconditionsSatisfied(GOAPWorldState worldState)
+        {
+            return (worldState.IsSubset(Preconditions));
         }
         /// <summary>
         /// Effects can Setup at runtime to decrease actions since you can make brunch actions into one using dynamic effects setting
         /// </summary>
-        protected virtual void SetupEffects(){}
+        protected virtual void SetupEffects() { }
         /// <summary>
         /// Transform target and conditions can SetUp at runtime
         /// </summary>
-        protected virtual void SetupDerived(){}
-        protected void AddTemporaryState(string name, bool val){
+        protected virtual void SetupDerived() { }
+        protected void AddTemporaryState(string name, bool val)
+        {
             worldState.SetState(name, val);
-            temporaryState[name]=val;
+            temporaryState[name] = val;
         }
-        protected void ClearTemporaryStates(){
-            foreach(var i in temporaryState){
-            worldState.RemoveState(i.Key);
+        protected void ClearTemporaryStates()
+        {
+            foreach (var i in temporaryState)
+            {
+                worldState.RemoveState(i.Key);
             }
             ResetTemporaryState();
         }

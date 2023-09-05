@@ -5,8 +5,8 @@ namespace Kurisu.GOAP.Example
     {
         protected sealed override void SetupDerived()
         {
-            preconditions["InDistance"]=true;
-            preconditions["HaveEnergy"]=true;
+            Preconditions["InDistance"] = true;
+            Preconditions["HaveEnergy"] = true;
         }
         public sealed override float GetCost()
         {

@@ -1,32 +1,33 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 namespace Kurisu.GOAP
 {
     [CreateAssetMenu(fileName = "GOAPGoalSet", menuName = "AkiGOAP/GOAPGoalSet")]
-    public class GOAPGoalSet : ScriptableObject,IGOAPSet
+    public class GOAPGoalSet : ScriptableObject, IGOAPSet
     {
-        [System.Serializable]
+        [Serializable]
         private class GoalInternalSet
         {
             [SerializeReference]
-            internal List<IGoal> goals=new List<IGoal>();
+            internal List<IGoal> goals = new();
             internal GoalInternalSet(List<GOAPBehavior> behaviors)
             {
-                foreach(var behavior in behaviors)
+                foreach (var behavior in behaviors)
                 {
-                    if(behavior is IGoal)goals.Add(behavior as IGoal);
+                    if (behavior is IGoal) goals.Add(behavior as IGoal);
                 }
             }
         }
         [SerializeReference]
-        private List<GOAPBehavior> behaviors=new();
-        #if UNITY_EDITOR
-        [Multiline(6),SerializeField]
+        private List<GOAPBehavior> behaviors = new();
+#if UNITY_EDITOR
+        [Multiline(6), SerializeField]
         public string Description;
-        #endif
-        public List<GOAPBehavior> Behaviors=>behaviors;
-        public Object _Object=>this;
-        
+#endif
+        public List<GOAPBehavior> Behaviors => behaviors;
+        public UnityEngine.Object Object => this;
+
         public List<IGoal> GetGoals()
         {
             return JsonUtility.FromJson<GoalInternalSet>(JsonUtility.ToJson(new GoalInternalSet(behaviors))).goals;

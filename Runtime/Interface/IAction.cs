@@ -6,19 +6,19 @@ namespace Kurisu.GOAP
     /// interface GOAP.IAction
     /// Basic interface for all GOAPActions
     /// </summary>
-    public interface IAction:INode
+    public interface IAction : INode
     {
         float GetCost();
         void Init(GOAPWorldState worldState);
         bool SatisfiesConditions(Dictionary<string, bool> conditions);
-        bool PreconditionsSatisfied(GOAPWorldState worldState); 
+        bool PreconditionsSatisfied(GOAPWorldState worldState);
         void OnTick();
         void OnActivate();
         void OnDeactivate();
-        public Dictionary<string, bool> preconditions{get;}
+        public Dictionary<string, bool> Preconditions { get; }
         // What will be in worldState when action completed
-        public Dictionary<string, bool> effects{get;}
-        public string Name{get;}
-        
+        public Dictionary<string, bool> Effects { get; }
+        public string Name { get; }
+
     }
 }

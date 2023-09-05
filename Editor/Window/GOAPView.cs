@@ -161,7 +161,7 @@ namespace Kurisu.GOAP.Editor
                 node.Commit();
                 set.Behaviors.Add(node.NodeBehavior);
             }
-            EditorUtility.SetDirty(set._Object);
+            EditorUtility.SetDirty(set.Object);
             AssetDatabase.SaveAssets();
         }
     }

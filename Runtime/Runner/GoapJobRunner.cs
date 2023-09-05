@@ -18,17 +18,17 @@ namespace Kurisu.GOAP.Runner
         public GOAPJobRunner(GOAPPlannerPro planner, IGraphResolver graphResolver)
         {
             this.planner = planner;
-            this.resolver = graphResolver;
+            resolver = graphResolver;
 
-            this.executableBuilder = this.resolver.GetExecutableBuilder();
-            this.positionBuilder = this.resolver.GetPositionBuilder();
-            this.costBuilder = this.resolver.GetCostBuilder();
-            this.conditionBuilder = this.resolver.GetConditionBuilder();
+            executableBuilder = resolver.GetExecutableBuilder();
+            positionBuilder = resolver.GetPositionBuilder();
+            costBuilder = resolver.GetCostBuilder();
+            conditionBuilder = resolver.GetConditionBuilder();
         }
 
         public void Run()
         {
-            this.resolveHandles.Clear();
+            resolveHandles.Clear();
             RunInternal(planner);
         }
 
@@ -40,47 +40,47 @@ namespace Kurisu.GOAP.Runner
                 return;
             if (planner.ActivateAction != null && planner.SkipSearchWhenActionRunning)
                 return;
-            this.FillBuilders(planner, planner.transform);
+            FillBuilders(planner, planner.transform);
             //Create job for each candidate goal
             foreach (var goal in planner.CandidateGoals)
-                this.resolveHandles.Add(new JobRunHandle(goal, this.resolver.StartResolve(new RunData
+                resolveHandles.Add(new JobRunHandle(goal, resolver.StartResolve(new RunData
                 {
-                    StartIndex = this.resolver.GetIndex(goal),
-                    IsExecutable = new NativeArray<bool>(this.executableBuilder.Build(), Allocator.TempJob),
-                    Positions = new NativeArray<float3>(this.positionBuilder.Build(), Allocator.TempJob),
-                    Costs = new NativeArray<float>(this.costBuilder.Build(), Allocator.TempJob),
-                    ConditionsMet = new NativeArray<bool>(this.conditionBuilder.Build(), Allocator.TempJob),
+                    StartIndex = resolver.GetIndex(goal),
+                    IsExecutable = new NativeArray<bool>(executableBuilder.Build(), Allocator.TempJob),
+                    Positions = new NativeArray<float3>(positionBuilder.Build(), Allocator.TempJob),
+                    Costs = new NativeArray<float>(costBuilder.Build(), Allocator.TempJob),
+                    ConditionsMet = new NativeArray<bool>(conditionBuilder.Build(), Allocator.TempJob),
                     DistanceMultiplier = 1f
                 })));
         }
 
         private void FillBuilders(IPlanner agent, Transform transform)
         {
-            this.executableBuilder.Clear();
-            this.positionBuilder.Clear();
-            this.conditionBuilder.Clear();
+            executableBuilder.Clear();
+            positionBuilder.Clear();
+            conditionBuilder.Clear();
 
             foreach (var node in agent.GetAllActions())
             {
                 var allMet = true;
-                foreach (var condition in node.Conditions)
+                foreach (var condition in node.ConditionStates)
                 {
                     if (!agent.WorldState.InSet(condition.Key, condition.Value))
                     {
                         allMet = false;
                         continue;
                     }
-                    this.conditionBuilder.SetConditionMet(condition, true);
+                    conditionBuilder.SetConditionMet(condition, true);
                 }
-                this.executableBuilder.SetExecutable(node, allMet);
-                this.costBuilder.SetCost(node, node.GetCost());
-                this.positionBuilder.SetPosition(node, agent.WorldState.ResolveNodeTarget(node)?.position ?? transform.position);
+                executableBuilder.SetExecutable(node, allMet);
+                costBuilder.SetCost(node, node.GetCost());
+                positionBuilder.SetPosition(node, agent.WorldState.ResolveNodeTarget(node)?.position ?? transform.position);
             }
         }
         public void Complete()
         {
             bool find = false;
-            foreach (var resolveHandle in this.resolveHandles)
+            foreach (var resolveHandle in resolveHandles)
             {
                 if (find)
                 {
@@ -100,7 +100,7 @@ namespace Kurisu.GOAP.Runner
                     find = true;
                 }
             }
-            this.resolveHandles.Clear();
+            resolveHandles.Clear();
             if (!find)
                 planner.SetCandidate(resultCache, null);
         }
@@ -112,7 +112,7 @@ namespace Kurisu.GOAP.Runner
                 resolveHandle.Handle.CompleteNonAlloc(ref resultCache);
             }
 
-            this.resolver.Dispose();
+            resolver.Dispose();
         }
 
         private struct JobRunHandle
@@ -121,8 +121,8 @@ namespace Kurisu.GOAP.Runner
             public IResolveHandle Handle { get; set; }
             public JobRunHandle(IGoal goal, IResolveHandle handle)
             {
-                this.Goal = goal;
-                this.Handle = handle;
+                Goal = goal;
+                Handle = handle;
             }
         }
     }

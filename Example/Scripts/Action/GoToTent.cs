@@ -7,12 +7,12 @@ namespace Kurisu.GOAP.Example
         protected sealed override void SetupDerived()
         {
             //Set precondition to let action automatically cancel
-            preconditions["CanRest"]=false;
-            worldState.RegisterNodeTarget(this,agent.Tent);
+            Preconditions["CanRest"] = false;
+            worldState.RegisterNodeTarget(this, agent.Tent);
         }
         protected sealed override void SetupEffects()
         {
-            effects["CanRest"]=true;
+            Effects["CanRest"] = true;
         }
         public sealed override float GetCost()
         {
@@ -22,7 +22,7 @@ namespace Kurisu.GOAP.Example
         {
             agent.NavMeshAgent.SetDestination(agent.Tent.position);
             //You can make a trigger to set state or other method based on unity engine lifetime scope
-            worldState.SetState("CanRest",Vector3.SqrMagnitude(agent._Transform.position-agent.Tent.position)<1);
+            worldState.SetState("CanRest", Vector3.SqrMagnitude(agent._Transform.position - agent.Tent.position) < 1);
         }
     }
 }

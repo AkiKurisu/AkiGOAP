@@ -6,38 +6,38 @@ namespace Kurisu.GOAP.Example
     {
         //We can expose some property to the graph editor
         //Use GOAPLabel to change the label of field in graph editor
-        [SerializeField,GOAPLabel("Wait Time 等待时间")]
-        private float waitTime=5;
+        [SerializeField, GOAPLabel("Wait Time 等待时间")]
+        private float waitTime = 5;
         private float timer;
         protected sealed override void SetupDerived()
         {
-            preconditions["CanRest"]=true;
+            Preconditions["CanRest"] = true;
         }
         protected sealed override void SetupEffects()
         {
-            effects["HaveEnergy"]=true;
+            Effects["HaveEnergy"] = true;
         }
         public sealed override void OnTick()
         {
-            timer+=Time.deltaTime;
-            if(timer>=waitTime)
+            timer += Time.deltaTime;
+            if (timer >= waitTime)
             {
-                timer=0;
-                agent.Energy=100;
-                worldState.SetState("HaveEnergy",true);
+                timer = 0;
+                agent.Energy = 100;
+                worldState.SetState("HaveEnergy", true);
             }
         }
         protected sealed override void OnActivateDerived()
         {
             //Reset timer when enter this action
-            timer=0;
-            agent.NavMeshAgent.isStopped=true;
+            timer = 0;
+            agent.NavMeshAgent.isStopped = true;
         }
         protected sealed override void OnDeactivateDerived()
         {
-            agent.NavMeshAgent.isStopped=false;
+            agent.NavMeshAgent.isStopped = false;
             //Reset signal state
-            worldState.SetState("CanRest",false);
+            worldState.SetState("CanRest", false);
         }
     }
 }

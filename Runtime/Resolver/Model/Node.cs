@@ -10,6 +10,6 @@ namespace Kurisu.GOAP.Resolver
         public INode InternalNode { get; set; }
         public List<NodeEffect> Effects { get; set; } = new List<NodeEffect>();
         public List<NodeCondition> Conditions { get; set; } = new List<NodeCondition>();
-        public bool IsRootNode => this.InternalNode.Effects == null || !this.InternalNode.Effects.Any();
+        public bool IsRootNode => this.InternalNode.EffectStates == null || !this.InternalNode.EffectStates.Any();
     }
 }

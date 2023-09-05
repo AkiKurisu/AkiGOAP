@@ -9,51 +9,54 @@ namespace Kurisu.GOAP
     //  preconditions required to attempt the goal, and an actionLayer that determines
     //  what layer of GOAPActions will be considered for valid action plans.
     /// </summary>
-    public abstract class GOAPGoal : GOAPBehavior,IGoal
+    public abstract class GOAPGoal : GOAPBehavior, IGoal
     {
-        protected GOAPWorldState worldState;    
+        protected GOAPWorldState worldState;
         // What must be in worldState for the goal to be complete
-        public Dictionary<string, bool> conditions{get; protected set;}
+        public Dictionary<string, bool> Conditions { get; protected set; }
         // What must be in worldState for the goal to be considered
-        public Dictionary<string, bool> preconditions{get; protected set;}
-        GOAPState[] INode.Effects => null;
-        public GOAPState[] Conditions {get;private set;}
-        public virtual string Name=>GetType().Name;
+        public Dictionary<string, bool> Preconditions { get; protected set; }
+        GOAPState[] INode.EffectStates => null;
+        public GOAPState[] ConditionStates { get; private set; }
+        public virtual string Name => GetType().Name;
         void IGoal.Init(GOAPWorldState worldState)
         {
-            conditions = new Dictionary<string, bool>();
-            preconditions = new Dictionary<string, bool>();
+            Conditions = new Dictionary<string, bool>();
+            Preconditions = new Dictionary<string, bool>();
             this.worldState = worldState;
             SetupDerived();
-            Conditions=conditions.Select(x=>new GOAPState(x)).ToArray();
+            ConditionStates = Conditions.Select(x => new GOAPState(x)).ToArray();
         }
         /// <summary>
         /// Set the complete condition of this goal
         /// </summary>
-        protected virtual void SetupDerived(){}
-        public virtual float GetPriority(){
+        protected virtual void SetupDerived() { }
+        public virtual float GetPriority()
+        {
             return 0f;
         }
 
-        public virtual bool PreconditionsSatisfied(GOAPWorldState worldState){
+        public virtual bool PreconditionsSatisfied(GOAPWorldState worldState)
+        {
             // Will return true if preconditions are empty
-            return worldState.IsSubset(preconditions);
+            return worldState.IsSubset(Preconditions);
         }
 
-        public virtual bool ConditionsSatisfied(GOAPWorldState worldState){
-            return worldState.IsSubset(conditions);
+        public virtual bool ConditionsSatisfied(GOAPWorldState worldState)
+        {
+            return worldState.IsSubset(Conditions);
         }
         /// <summary>
         /// Called every frame by GOAPPlanner
         /// </summary>
-        public virtual void OnTick(){}
+        public virtual void OnTick() { }
         /// <summary>
         /// Called when selected by GOAPPlanner
         /// </summary>
-        public virtual void OnActivate(){}
+        public virtual void OnActivate() { }
         /// <summary>
         /// Called by GOAPPlanner when goal achieved or plan cancelled
         /// </summary>
-        public virtual void OnDeactivate(){}
+        public virtual void OnDeactivate() { }
     }
 }

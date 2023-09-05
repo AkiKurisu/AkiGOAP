@@ -5,7 +5,7 @@ namespace Kurisu.GOAP
     /// <summary>
     /// Basic interface for all GOAPGoals
     /// </summary>
-    public interface IGoal:INode
+    public interface IGoal : INode
     {
         /// <summary>
         /// Set static or dynamic priority of this goal
@@ -21,10 +21,10 @@ namespace Kurisu.GOAP
         void OnTick();
         void OnActivate();
         void OnDeactivate();
-        Dictionary<string, bool> conditions{get;}
+        Dictionary<string, bool> Conditions { get; }
 
         // What must be in worldState for the goal to be considered
-        Dictionary<string, bool> preconditions{get;}
-        string Name{get;}
+        Dictionary<string, bool> Preconditions { get; }
+        string Name { get; }
     }
 }

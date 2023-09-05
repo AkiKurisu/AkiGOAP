@@ -5,7 +5,7 @@ namespace Kurisu.GOAP.Example
         protected ExampleAgent agent;
         public void Inject(ExampleAgent agent)
         {
-            this.agent=agent;
+            this.agent = agent;
         }
     }
 }

@@ -12,17 +12,17 @@ namespace Kurisu.GOAP.Editor
         private GOAPView graphView;
         public static void ShowEditorWindow(IGOAPSet set)
         {
-            var key = set._Object.GetHashCode();
+            var key = set.Object.GetHashCode();
             if (cache.ContainsKey(key))
             {
                 cache[key].Focus();
                 return;
             }
             var window = CreateInstance<GOAPEditorWindow>();
-            window.titleContent = new GUIContent($"GOAP Editor ({set._Object.name})");
+            window.titleContent = new GUIContent($"GOAP Editor ({set.Object.name})");
             window.Show();
             window.Focus();
-            window.Key = set._Object;
+            window.Key = set.Object;
             cache[key] = window;
             window.StructGraphView(set);
         }

@@ -5,7 +5,7 @@ namespace Kurisu.GOAP.Example
     {
         protected sealed override void SetupEffects()
         {
-            effects["InDistance"]=true;
+            Effects["InDistance"] = true;
         }
         public sealed override float GetCost()
         {

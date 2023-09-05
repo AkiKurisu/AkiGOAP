@@ -1,44 +1,45 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 namespace Kurisu.GOAP
 {
     [CreateAssetMenu(fileName = "GOAPSet", menuName = "AkiGOAP/GOAPSet")]
-    public class GOAPSet : ScriptableObject,IGOAPSet
+    public class GOAPSet : ScriptableObject, IGOAPSet
     {
-        [System.Serializable]
+        [Serializable]
         private class GoalInternalSet
         {
             [SerializeReference]
-            internal List<IGoal> goals=new List<IGoal>();
+            internal List<IGoal> goals = new();
             internal GoalInternalSet(List<GOAPBehavior> behaviors)
             {
-                foreach(var behavior in behaviors)
+                foreach (var behavior in behaviors)
                 {
-                    if(behavior is IGoal)goals.Add(behavior as IGoal);
+                    if (behavior is IGoal) goals.Add(behavior as IGoal);
                 }
             }
         }
-        [System.Serializable]
+        [Serializable]
         private class ActionInternalSet
         {
             [SerializeReference]
-            internal List<IAction> actions=new List<IAction>();
+            internal List<IAction> actions = new();
             internal ActionInternalSet(List<GOAPBehavior> behaviors)
             {
-                foreach(var behavior in behaviors)
+                foreach (var behavior in behaviors)
                 {
-                    if(behavior is IAction)actions.Add(behavior as IAction);
+                    if (behavior is IAction) actions.Add(behavior as IAction);
                 }
             }
         }
         [SerializeReference]
-        private List<GOAPBehavior> behaviors=new();
-        #if UNITY_EDITOR
-        [Multiline(6),SerializeField]
+        private List<GOAPBehavior> behaviors = new();
+#if UNITY_EDITOR
+        [Multiline(6), SerializeField]
         public string Description;
-        #endif
-        public List<GOAPBehavior> Behaviors=>behaviors;
-        public Object _Object=>this;
+#endif
+        public List<GOAPBehavior> Behaviors => behaviors;
+        public UnityEngine.Object Object => this;
 
         public List<IGoal> GetGoals()
         {
