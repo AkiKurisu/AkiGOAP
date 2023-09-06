@@ -686,10 +686,10 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'This Example works more like <b>GOAP</b> itself and may be hard to understand:
+  m_Text: 'This Example works more like <b>GOAP</b> itself and may be harder to understand:
 
     1.
-    We only have one goal now : Follow Player
+    We only have one goal now : Idle Close to Player
 
     2. The plan will be dynamically
     changed if world state changed, such as we don''t have enough energy
