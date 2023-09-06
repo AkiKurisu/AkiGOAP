@@ -8,6 +8,7 @@ namespace Kurisu.GOAP.Example
         private int minAmount = 0;
         protected sealed override void SetupDerived()
         {
+            //Set this precondition to let goal automatically cancel
             Preconditions["HaveEnergy"] = false;
             Conditions["HaveEnergy"] = true;
         }
@@ -17,6 +18,7 @@ namespace Kurisu.GOAP.Example
         }
         public sealed override void OnTick()
         {
+            //Following condition works as world sensor
             worldState.SetState("HaveEnergy", agent.Energy > minAmount);
         }
     }

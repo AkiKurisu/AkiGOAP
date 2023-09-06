@@ -1,18 +1,16 @@
 using UnityEngine;
 namespace Kurisu.GOAP.Example
 {
-    [GOAPLabel("Follow Player 跟随玩家")]
-    public class FollowPlayerGoal : ExampleGoal
+    [GOAPLabel("Idle Close to Player 在玩家附近待机")]
+    public class IdleCloseToPlayer : ExampleGoal
     {
         [SerializeField]
         private float distance = 4;
+        [SerializeField]
+        private int minAmount = 0;
         protected sealed override void SetupDerived()
         {
-            //This precondition works as a state key to let planner transfer to other goal
-            Preconditions["HaveEnergy"] = true;
-            //Set this precondition to let goal automatically cancel
-            Preconditions["InDistance"] = false;
-            Conditions["InDistance"] = true;
+            Conditions["Idle"] = true;
         }
         public sealed override float GetPriority()
         {
@@ -23,6 +21,7 @@ namespace Kurisu.GOAP.Example
             //Following condition works as world sensor
             //If distance * distance is smaller than 4, set 'InDistance' to true
             worldState.SetState("InDistance", Vector3.SqrMagnitude(agent.Transform.position - agent.Player.position) < distance);
+            worldState.SetState("HaveEnergy", agent.Energy > minAmount);
         }
     }
 }

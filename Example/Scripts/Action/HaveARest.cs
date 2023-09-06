@@ -12,6 +12,8 @@ namespace Kurisu.GOAP.Example
         protected sealed override void SetupDerived()
         {
             Preconditions["CanRest"] = true;
+            //Set this precondition to let action automatically cancel
+            Preconditions["HaveEnergy"] = false;
         }
         protected sealed override void SetupEffects()
         {

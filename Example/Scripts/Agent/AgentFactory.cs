@@ -16,6 +16,8 @@ namespace Kurisu.GOAP.Example
         [SerializeField]
         private GOAPSet dataSet;
         private ExampleAgent[] agents;
+        [Header("Runtime Property"), SerializeField]
+        private float agentEnergy;
         private void Awake()
         {
             agents = new ExampleAgent[maxAmount];
@@ -39,6 +41,7 @@ namespace Kurisu.GOAP.Example
             {
                 agents[i].LossEnergy();
             }
+            agentEnergy = agents[0].Energy;
         }
         private Vector3 GetRandomPosition()
         {

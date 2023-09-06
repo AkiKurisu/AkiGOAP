@@ -6,7 +6,7 @@ namespace Kurisu.GOAP.Example
     {
         protected sealed override void SetupDerived()
         {
-            //Set precondition to let action automatically cancel
+            //Set this precondition to let action automatically cancel
             Preconditions["CanRest"] = false;
             worldState.RegisterNodeTarget(this, agent.Tent);
         }
@@ -16,6 +16,8 @@ namespace Kurisu.GOAP.Example
         }
         public sealed override float GetCost()
         {
+            //Cost can be set to the distance between player and target
+            //However we can caculate the position in Planner Pro, so we skip it
             return 1;
         }
         public sealed override void OnTick()
