@@ -1,7 +1,7 @@
 # AkiGOAP Example
 
-1. ``Example1 FSM Like.unity`` provides an AI example similar to FSM (Finite State Machine). The state is converted into different goals in GOAP. We switch the currently running goal by switching the World State, that is, switch between different goals. status
-2. ``Example2 GOAP Like.unity`` provides a more GOAP-like AI example. When the Goal remains unchanged, the path planning of the Plan changes due to changes in the WorldState
+1. ``Example1 FSM Like.unity`` provides an AI example similar to FSM (Finite State Machine). The state is converted into different goals in GOAP. When the World State changes, the Planner will switch the currently running Goal, that is, switch between different states.
+2. ``Example2 GOAP Like.unity`` provides a more GOAP-like AI example. When the Goal remains unchanged, the path planning of the Plan changes due to changes in the WorldState.
 
 ## Eample1 Description
 

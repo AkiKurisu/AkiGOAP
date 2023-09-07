@@ -1,6 +1,10 @@
 using System;
 using System.Reflection;
+#if !UNITY_2022_1_OR_NEWER
 using UnityEditor.UIElements;
+#else
+using UnityEngine.UIElements;
+#endif
 using UnityEngine;
 namespace Kurisu.GOAP.Editor
 {
@@ -13,6 +17,6 @@ namespace Kurisu.GOAP.Editor
         {
             return new Vector2Field(fieldInfo.Name);
         }
-        public static bool IsAcceptable(Type infoType,FieldInfo info)=>infoType == typeof(Vector2);
+        public static bool IsAcceptable(Type infoType, FieldInfo info) => infoType == typeof(Vector2);
     }
 }

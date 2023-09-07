@@ -1,11 +1,14 @@
 using System;
 using System.Reflection;
+#if !UNITY_2022_1_OR_NEWER
 using UnityEditor.UIElements;
+#else
+using UnityEngine.UIElements;
+#endif
 using UnityEngine;
-
 namespace Kurisu.GOAP.Editor
 {
-    public class RectIntResolver : FieldResolver<RectIntField,RectInt>
+    public class RectIntResolver : FieldResolver<RectIntField, RectInt>
     {
         public RectIntResolver(FieldInfo fieldInfo) : base(fieldInfo)
         {
@@ -14,6 +17,6 @@ namespace Kurisu.GOAP.Editor
         {
             return new RectIntField(fieldInfo.Name);
         }
-        public static bool IsAcceptable(Type infoType,FieldInfo info)=>infoType == typeof(RectInt);
+        public static bool IsAcceptable(Type infoType, FieldInfo info) => infoType == typeof(RectInt);
     }
 }

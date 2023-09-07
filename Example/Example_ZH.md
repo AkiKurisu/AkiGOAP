@@ -1,6 +1,6 @@
 # AkiGOAP Example
 
-1. ``Example1 FSM Like.unity``提供了一个类似于FSM（有限状态机）的AI示例，状态在GOAP被转换为了不同的Goal，我们通过切换World State来切换当前运行的目标即切换不同的状态
+1. ``Example1 FSM Like.unity``提供了一个类似于FSM（有限状态机）的AI示例，状态在GOAP被转换为了不同的Goal，当World State改变时Planner会切换当前运行的Goal，即切换不同的状态
 2. ``Example2 GOAP Like.unity``提供了一个更像GOAP的AI示例，Goal不变的情况下，由于WorldState变化，Plan的路径规划发生改变
 
 ## Eample1说明
