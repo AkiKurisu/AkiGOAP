@@ -4,37 +4,37 @@
 /// </summary>
 namespace Kurisu.GOAP.Resolver
 {
-    public class ConditionBuilder : IConditionBuilder
+    public class ConditionBuilder:IConditionBuilder
     {
         private readonly List<GOAPState> conditionIndexList;
-        private readonly bool[] conditionsMetList;
-
+        private bool[] conditionsMetList;
+        
         public ConditionBuilder(List<GOAPState> conditionIndexList)
         {
             this.conditionIndexList = conditionIndexList;
-            conditionsMetList = new bool[this.conditionIndexList.Count];
+            this.conditionsMetList = new bool[this.conditionIndexList.Count];
         }
-
+        
         public IConditionBuilder SetConditionMet(GOAPState condition, bool met)
         {
-            var index = conditionIndexList.IndexOf(condition);
+            var index = this.conditionIndexList.FindIndex(x => x == condition);
 
             if (index == -1)
                 return this;
-
-            conditionsMetList[index] = met;
+            
+            this.conditionsMetList[index] = met;
 
             return this;
         }
-
+        
         public bool[] Build()
         {
-            return conditionsMetList;
+            return this.conditionsMetList;
         }
-
+        
         public void Clear()
         {
-            for (int i = 0; i < conditionIndexList.Count; i++) conditionsMetList[i] = false;
+            for(int i=0;i<conditionIndexList.Count;i++)this.conditionsMetList[i]=false;
         }
     }
 }

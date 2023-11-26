@@ -7,7 +7,7 @@ namespace Kurisu.GOAP.Editor
     [CustomEditor(typeof(GOAPGoalSet))]
     public class GOAPGoalSetEditor : UnityEditor.Editor
     {
-        private const string LabelText = "AkiGOAP <size=12>V1.1.1</size> GoalSet";
+        private const string LabelText = "AkiGOAP <size=12>V1.1</size> GoalSet";
         private const string ButtonText = "Open GOAP Editor";
         public override VisualElement CreateInspectorGUI()
         {

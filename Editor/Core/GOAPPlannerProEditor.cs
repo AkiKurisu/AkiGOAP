@@ -7,7 +7,7 @@ namespace Kurisu.GOAP.Editor
     [CustomEditor(typeof(GOAPPlannerPro), true)]
     public class GOAPPlannerProEditor : UnityEditor.Editor
     {
-        private const string LabelText = "AkiGOAP <size=12>V1.1.1</size> Planner Pro";
+        private const string LabelText = "AkiGOAP <size=12>V1.1</size> Planner Pro";
         private const string ButtonText = "Open Planner Snapshot";
         private const string GraphButtonText = "Open GOAP Editor";
         private const string IsActiveTooltip = "Whether current planner is active, will be disbled automatically" +

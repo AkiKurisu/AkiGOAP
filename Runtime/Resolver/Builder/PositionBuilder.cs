@@ -7,37 +7,37 @@ using UnityEngine;
 /// </summary>
 namespace Kurisu.GOAP.Resolver
 {
-    public class PositionBuilder : IPositionBuilder
+    public class PositionBuilder:IPositionBuilder
     {
         private readonly List<INode> nodeIndexList;
-        private readonly float3[] executableList;
+        private float3[] executableList;
 
         public PositionBuilder(List<INode> nodeIndexList)
         {
             this.nodeIndexList = nodeIndexList;
-            executableList = this.nodeIndexList.Select(x => GraphResolverJob.InvalidPosition).ToArray();
+            this.executableList = this.nodeIndexList.Select(x => GraphResolverJob.InvalidPosition).ToArray();
         }
-
+        
         public IPositionBuilder SetPosition(INode node, Vector3 position)
         {
-            var index = nodeIndexList.IndexOf(node);
+            var index = this.nodeIndexList.IndexOf(node);
 
             if (index == -1)
                 return this;
-
-            executableList[index] = position;
+            
+            this.executableList[index] = position;
 
             return this;
         }
-
+        
         public float3[] Build()
         {
-            return executableList;
+            return this.executableList;
         }
 
         public void Clear()
         {
-            for (int i = 0; i < nodeIndexList.Count; i++) executableList[i] = GraphResolverJob.InvalidPosition;
+            for(int i=0;i<nodeIndexList.Count;i++)this.executableList[i]=GraphResolverJob.InvalidPosition;
         }
     }
 }
