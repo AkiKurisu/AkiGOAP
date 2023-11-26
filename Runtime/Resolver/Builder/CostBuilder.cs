@@ -5,32 +5,32 @@ using System.Linq;
 /// </summary>
 namespace Kurisu.GOAP.Resolver
 {
-    public class CostBuilder : ICostBuilder
+    public class CostBuilder:ICostBuilder
     {
         private readonly List<INode> nodeIndexList;
-        private readonly float[] costList;
+        private float[] costList;
 
         public CostBuilder(List<INode> nodeIndexList)
         {
             this.nodeIndexList = nodeIndexList;
-            costList = this.nodeIndexList.Select(x => 1f).ToArray();
+            this.costList = this.nodeIndexList.Select(x => 1f).ToArray();
         }
-
+        
         public ICostBuilder SetCost(INode node, float cost)
         {
-            var index = nodeIndexList.IndexOf(node);
+            var index = this.nodeIndexList.IndexOf(node);
 
             if (index == -1)
                 return this;
-
-            costList[index] = cost;
+            
+            this.costList[index] = cost;
 
             return this;
         }
-
+        
         public float[] Build()
         {
-            return costList;
+            return this.costList;
         }
     }
 }

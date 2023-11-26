@@ -9,21 +9,21 @@ namespace Kurisu.GOAP.Resolver
     {
         public Graph Build(IEnumerable<INode> nodesToBuild)
         {
-            var (RootNodes, ChildNodes) = nodesToBuild.ToNodes();
+            var nodes = nodesToBuild.ToNodes();
 
             var graph = new Graph
             {
-                RootNodes = RootNodes.ToList(),
+                RootNodes = nodes.RootNodes.ToList(),
             };
 
-            var allNodes = RootNodes.Union(ChildNodes).ToArray();
+            var allNodes = nodes.RootNodes.Union(nodes.ChildNodes).ToArray();
 
-            var effectMap = GetEffectMap(allNodes);
-            var conditionMap = GetConditionMap(allNodes);
+            var effectMap = this.GetEffectMap(allNodes);
+            var conditionMap = this.GetConditionMap(allNodes);
 
-            foreach (var node in RootNodes)
+            foreach (var node in nodes.RootNodes)
             {
-                ConnectNodes(node, effectMap, conditionMap, graph);
+                this.ConnectNodes(node, effectMap, conditionMap, graph);
             }
 
             return graph;
@@ -53,7 +53,7 @@ namespace Kurisu.GOAP.Resolver
 
                 foreach (var subNode in actionNodeCondition.Connections)
                 {
-                    ConnectNodes(subNode, effectMap, conditionMap, graph);
+                    this.ConnectNodes(subNode, effectMap, conditionMap, graph);
                 }
             }
         }
