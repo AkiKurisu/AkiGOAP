@@ -119,7 +119,7 @@ namespace Kurisu.GOAP
         /// <returns></returns>
         public bool PreconditionsSatisfied(GOAPWorldState worldState)
         {
-            return (worldState.IsSubset(Preconditions));
+            return worldState.IsSubset(Preconditions);
         }
         /// <summary>
         /// Effects can Setup at runtime to decrease actions since you can make brunch actions into one using dynamic effects setting
