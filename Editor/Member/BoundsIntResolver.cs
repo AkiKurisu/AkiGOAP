@@ -1,14 +1,10 @@
 using System;
 using System.Reflection;
-#if !UNITY_2022_1_OR_NEWER
 using UnityEditor.UIElements;
-#else
-using UnityEngine.UIElements;
-#endif
 using UnityEngine;
 namespace Kurisu.GOAP.Editor
 {
-    public class BoundsIntResolver : FieldResolver<BoundsIntField, BoundsInt>
+    public class BoundsIntResolver : FieldResolver<BoundsIntField,BoundsInt>
     {
         public BoundsIntResolver(FieldInfo fieldInfo) : base(fieldInfo)
         {
@@ -17,6 +13,6 @@ namespace Kurisu.GOAP.Editor
         {
             return new BoundsIntField(fieldInfo.Name);
         }
-        public static bool IsAcceptable(Type infoType, FieldInfo info) => infoType == typeof(BoundsInt);
+        public static bool IsAcceptable(Type infoType,FieldInfo info)=>infoType == typeof(BoundsInt);
     }
 }

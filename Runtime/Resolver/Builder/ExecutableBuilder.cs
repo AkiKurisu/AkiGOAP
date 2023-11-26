@@ -5,37 +5,37 @@ using System.Linq;
 /// </summary>
 namespace Kurisu.GOAP.Resolver
 {
-    public class ExecutableBuilder:IExecutableBuilder
+    public class ExecutableBuilder : IExecutableBuilder
     {
         private readonly List<INode> nodeIndexList;
-        private bool[] executableList;
+        private readonly bool[] executableList;
 
         public ExecutableBuilder(List<INode> nodeIndexList)
         {
             this.nodeIndexList = nodeIndexList;
-            this.executableList = this.nodeIndexList.Select(x => false).ToArray();
+            executableList = this.nodeIndexList.Select(x => false).ToArray();
         }
-        
+
         public IExecutableBuilder SetExecutable(INode node, bool executable)
         {
-            var index = this.nodeIndexList.IndexOf(node);
+            var index = nodeIndexList.IndexOf(node);
 
             if (index == -1)
                 return this;
-            
-            this.executableList[index] = executable;
+
+            executableList[index] = executable;
 
             return this;
         }
 
         public void Clear()
         {
-            for(int i=0;i<nodeIndexList.Count;i++)this.executableList[i]=false;
+            for (int i = 0; i < nodeIndexList.Count; i++) executableList[i] = false;
         }
-        
+
         public bool[] Build()
         {
-            return this.executableList;
+            return executableList;
         }
     }
 }
