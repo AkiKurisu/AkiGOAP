@@ -27,8 +27,7 @@ AkiGOAP is a Goal Oriented Action Planner unity plugin that supports visualizati
 * Unity 2021.3 or Later
 
 ## Set Up
-1. Download [Release Package](https://github.com/AkiKurisu/AkiGOAP/releases)
-2. Using git URL to download package by Unity PackageManager ```https://github.com/AkiKurisu/AkiGOAP.git```
+1. Using git URL to download package by Unity PackageManager ```https://github.com/AkiKurisu/AkiGOAP.git```
 #
 
 ## How To Use
