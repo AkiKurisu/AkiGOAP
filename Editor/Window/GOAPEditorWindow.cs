@@ -8,9 +8,11 @@ namespace Kurisu.GOAP.Editor
 {
     public class GOAPEditorWindow : EditorWindow
     {
-        private static readonly Dictionary<int, GOAPEditorWindow> cache = new Dictionary<int, GOAPEditorWindow>();
+        private static readonly Dictionary<int, GOAPEditorWindow> cache = new();
         private UnityEngine.Object Key { get; set; }
         private GOAPView graphView;
+        private SnapshotView snapshotView;
+        private bool enableSnapshot;
         public static void ShowEditorWindow(IGOAPSet set)
         {
             var key = set.Object.GetHashCode();
@@ -50,6 +52,19 @@ namespace Kurisu.GOAP.Editor
                     }
                     GUI.enabled = true;
                     GUILayout.FlexibleSpace();
+                    GUI.enabled = graphView.Set is IPlanner planner;
+                    bool newValue = GUILayout.Toggle(enableSnapshot, "Snapshot", EditorStyles.toolbarButton);
+                    if (newValue != enableSnapshot)
+                    {
+                        enableSnapshot = newValue;
+                        if (!enableSnapshot && snapshotView != null)
+                        {
+                            rootVisualElement.Remove(snapshotView);
+                            snapshotView = null;
+                        }
+                        else if (enableSnapshot && snapshotView == null)
+                            rootVisualElement.Add(snapshotView = new SnapshotView(graphView.Set as IPlanner));
+                    }
                     if (GUILayout.Button($"Save To Json", EditorStyles.toolbarButton))
                     {
                         string path = EditorUtility.SaveFilePanel("Select json file save path", Application.dataPath, graphView.Set.Object.name, "json");

@@ -9,7 +9,7 @@ namespace Kurisu.GOAP.Editor
         {
             label.style.color = Color.black;
         }
-        private readonly Label label = new Label();
+        private readonly Label label = new();
 
         protected sealed override void OnCleanUp()
         {

@@ -15,7 +15,7 @@ namespace Kurisu.GOAP.Editor
         internal System.Action<GOAPNode> onSelectAction;
         private readonly IGOAPSet set;
         public IGOAPSet Set => set;
-        private readonly NodeResolver nodeResolver = new NodeResolver();
+        private readonly NodeResolver nodeResolver = new();
         private GOAPNodeStack goalStack;
         private GOAPNodeStack actionStack;
         public GOAPView(EditorWindow editor, IGOAPSet set)
@@ -112,7 +112,7 @@ namespace Kurisu.GOAP.Editor
             if (set is IPlanner)
             {
                 IPlanner planner = set as IPlanner;
-                planner.OnUpdatePlanEvent += UpdateView;
+                planner.OnPlanUpdate += UpdateView;
             }
         }
         private void UpdateView(IPlanner planner)

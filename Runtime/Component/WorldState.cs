@@ -9,7 +9,7 @@ namespace Kurisu.GOAP
     //  The local StateSet is specific to the GameObject, whereas the global StateSet
     //  can be shared between GameObjects.
     /// </summary>
-    public class GOAPWorldState : MonoBehaviour
+    public class WorldState : MonoBehaviour
     {
         //Attached and specific to the GameObject 
         private GOAPStateSet localState;

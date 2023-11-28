@@ -12,9 +12,9 @@ namespace Kurisu.GOAP
         /// </summary>
         /// <returns></returns>
         float GetPriority();
-        void Init(GOAPWorldState worldState);
-        bool ConditionsSatisfied(GOAPWorldState worldState);
-        bool PreconditionsSatisfied(GOAPWorldState worldState);
+        void Init(WorldState worldState);
+        bool ConditionsSatisfied(WorldState worldState);
+        bool PreconditionsSatisfied(WorldState worldState);
         /// <summary>
         /// Goal OnTick for collecting data or sensoring state or sending event
         /// </summary>

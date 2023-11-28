@@ -1,7 +1,7 @@
 {
   "name": "com.kurisu.akigoap",
   "displayName": "AkiGOAP",
-  "version": "1.0.1",
+  "version": "1.1.1",
   "unity": "2021.3",
   "description": "Modular and high-performed Goal Oriental Action Planner with well designed visual graph editor.",
   "keywords": [
@@ -21,5 +21,12 @@
   },
   "dependencies": {
     "com.unity.collections": "1.2.4"
-  }
+  },
+  "samples": [
+    {
+      "displayName": "GOAP Example",
+      "description": "Simple example of usage",
+      "path": "Samples~/Example"
+    }
+  ]
 }

@@ -9,9 +9,9 @@ namespace Kurisu.GOAP
     public interface IAction : INode
     {
         float GetCost();
-        void Init(GOAPWorldState worldState);
+        void Init(WorldState worldState);
         bool SatisfiesConditions(Dictionary<string, bool> conditions);
-        bool PreconditionsSatisfied(GOAPWorldState worldState);
+        bool PreconditionsSatisfied(WorldState worldState);
         void OnTick();
         void OnActivate();
         void OnDeactivate();

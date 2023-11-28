@@ -11,7 +11,7 @@ namespace Kurisu.GOAP
     /// </summary>
     public abstract class GOAPGoal : GOAPBehavior, IGoal
     {
-        protected GOAPWorldState worldState;
+        protected WorldState worldState;
         // What must be in worldState for the goal to be complete
         public Dictionary<string, bool> Conditions { get; protected set; }
         // What must be in worldState for the goal to be considered
@@ -19,7 +19,7 @@ namespace Kurisu.GOAP
         GOAPState[] INode.EffectStates => null;
         public GOAPState[] ConditionStates { get; private set; }
         public virtual string Name => GetType().Name;
-        void IGoal.Init(GOAPWorldState worldState)
+        void IGoal.Init(WorldState worldState)
         {
             Conditions = new Dictionary<string, bool>();
             Preconditions = new Dictionary<string, bool>();
@@ -36,13 +36,13 @@ namespace Kurisu.GOAP
             return 0f;
         }
 
-        public virtual bool PreconditionsSatisfied(GOAPWorldState worldState)
+        public virtual bool PreconditionsSatisfied(WorldState worldState)
         {
             // Will return true if preconditions are empty
             return worldState.IsSubset(Preconditions);
         }
 
-        public virtual bool ConditionsSatisfied(GOAPWorldState worldState)
+        public virtual bool ConditionsSatisfied(WorldState worldState)
         {
             return worldState.IsSubset(Conditions);
         }

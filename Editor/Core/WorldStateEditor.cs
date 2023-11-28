@@ -6,8 +6,8 @@ using System.Collections.Generic;
 using System.Reflection;
 namespace Kurisu.GOAP.Editor
 {
-    [CustomEditor(typeof(GOAPWorldState), true)]
-    public class GOAPWorldStateEditor : UnityEditor.Editor
+    [CustomEditor(typeof(WorldState), true)]
+    public class WorldStateEditor : UnityEditor.Editor
     {
         private const string LabelText = "AkiGOAP <size=12>V1.1.1</size> WorldState";
         private const string WorldState = "Runtime States:";
@@ -20,37 +20,40 @@ namespace Kurisu.GOAP.Editor
         public override VisualElement CreateInspectorGUI()
         {
             var myInspector = new VisualElement();
-            var state = target as GOAPWorldState;
+            var state = target as WorldState;
             myInspector.Add(UIUtility.GetLabel(LabelText, 20));
             InspectorElement.FillDefaultInspector(myInspector, serializedObject, this);
             myInspector.Remove(myInspector.Q<PropertyField>("PropertyField:m_Script"));
-            var localState = state != null ? state.LocalState : null;
-            if (localState == null) return myInspector;
-            if (StatesInfo.GetValue(localState) is not Dictionary<string, bool> states || states.Count == 0) return myInspector;
-            var stateLabel = new Label(WorldState);
-            stateLabel.style.fontSize = 15;
-            myInspector.Add(stateLabel);
-            statesGroup = new VisualElement();
-            myInspector.Add(statesGroup);
-            RefreshStates();
+            if (Application.isPlaying)
+            {
+                var localState = state != null ? state.LocalState : null;
+                var stateLabel = new Label(WorldState);
+                stateLabel.style.fontSize = 15;
+                myInspector.Add(stateLabel);
+                statesGroup = new VisualElement();
+                myInspector.Add(statesGroup);
+                if (StatesInfo.GetValue(localState) is not Dictionary<string, bool> states || states.Count == 0) return myInspector;
+                if (localState == null) return myInspector;
+                RefreshStates();
+            }
             return myInspector;
         }
         private void OnEnable()
         {
             if (!Application.isPlaying) return;
-            var state = target as GOAPWorldState;
+            var state = target as WorldState;
             state.OnUpdate += RefreshStates;
         }
         private void OnDisable()
         {
             if (!Application.isPlaying) return;
-            var state = target as GOAPWorldState;
+            var state = target as WorldState;
             state.OnUpdate -= RefreshStates;
         }
         private void RefreshStates()
         {
             statesGroup.Clear();
-            var state = target as GOAPWorldState;
+            var state = target as WorldState;
             var localState = state != null ? state.LocalState : null;
             if (localState != null)
             {

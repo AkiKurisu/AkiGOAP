@@ -55,11 +55,11 @@ namespace Kurisu.GOAP
     /// Identifies the highest priority GOAPGoal with a viable action plan
     /// and carries out that action plan.
     /// </summary>
-    [RequireComponent(typeof(GOAPWorldState))]
+    [RequireComponent(typeof(WorldState))]
     public class GOAPPlanner : MonoBehaviour, IPlanner
     {
-        protected GOAPWorldState worldState;
-        public GOAPWorldState WorldState => worldState;
+        protected WorldState worldState;
+        public WorldState WorldState => worldState;
         protected readonly List<IGoal> goals = new();
         protected readonly List<IAction> actions = new();
         //// Active
@@ -80,7 +80,7 @@ namespace Kurisu.GOAP
         private bool LogFail => logType.HasFlag(LogType.IncludeFail);
         public List<GOAPBehavior> Behaviors => Enumerable.Empty<GOAPBehavior>().Concat(actions.OfType<GOAPBehavior>()).Concat(goals.OfType<GOAPBehavior>()).ToList();
         public UnityEngine.Object Object => gameObject;
-        public event System.Action<IPlanner> OnUpdatePlanEvent;
+        public event System.Action<IPlanner> OnPlanUpdate;
         [SerializeField, Tooltip("Nothing: Automatically update planner.\n" +
         "ManualUpdateGoal: Toggle this to disable planner to tick goal automatically.\n" +
         "ManualActivatePlanner: Toggle this to disable planner to tick and search plan automatically," +
@@ -90,7 +90,7 @@ namespace Kurisu.GOAP
         public bool IsActive { get; private set; } = true;
         private void Awake()
         {
-            worldState = GetComponent<GOAPWorldState>();
+            worldState = GetComponent<WorldState>();
             IsActive &= !tickType.HasFlag(TickType.ManualActivatePlanner);
         }
         private void Update()
@@ -129,7 +129,7 @@ namespace Kurisu.GOAP
             if ((NoActiveGoal() && GoalAvailable()) || BetterGoalAvailable())
             {
                 StartCurrentBestGoal();
-                OnUpdatePlanEvent?.Invoke(this);
+                OnPlanUpdate?.Invoke(this);
             }
             else
             {
@@ -336,7 +336,7 @@ namespace Kurisu.GOAP
         private List<IAction> candicatePath = new List<IAction>();
         #endregion
         //// A*
-        private List<IAction> GetOptimalPath(GOAPWorldState currentState, IGoal goal)
+        private List<IAction> GetOptimalPath(WorldState currentState, IGoal goal)
         {
             if (LogSearch) PlannerLog($"Searching for plan for {goal.Name}", bold: true);
             validStartActionsCache.Clear();
@@ -388,7 +388,7 @@ namespace Kurisu.GOAP
         /// <param name="goal"></param>
         /// <returns></returns>
         private List<IAction> SearchPath(
-            GOAPWorldState currentState,
+            WorldState currentState,
             List<ActionNode> openList,
             List<ActionNode> closedList,
             IGoal goal)

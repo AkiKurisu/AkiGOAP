@@ -16,7 +16,7 @@ namespace Kurisu.GOAP.Editor
         private readonly TextField description;
         public string Description => description.value;
         private readonly FieldResolverFactory fieldResolverFactory;
-        public readonly List<IFieldResolver> resolvers = new List<IFieldResolver>();
+        public readonly List<IFieldResolver> resolvers = new();
         public Action<GOAPNode> onSelectAction;
         public sealed override void OnSelected()
         {
@@ -36,7 +36,7 @@ namespace Kurisu.GOAP.Editor
         private void Initialize()
         {
             AddDescription();
-            mainContainer.Add(this.container);
+            mainContainer.Add(container);
         }
 
         private void AddDescription()
@@ -81,12 +81,12 @@ namespace Kurisu.GOAP.Editor
 
             nodeBehavior
                 .GetFields(BindingFlags.Public | BindingFlags.Instance)
-                .Where(field => field.GetCustomAttribute<HideInInspector>() == null)//根据Atrribute判断是否需要隐藏
-                .Concat(GetAllFields(nodeBehavior))//Concat合并列表
+                .Where(field => field.GetCustomAttribute<HideInInspector>() == null)
+                .Concat(GetAllFields(nodeBehavior))
                 .Where(field => field.IsInitOnly == false)
                 .ToList().ForEach((p) =>
                 {
-                    var fieldResolver = fieldResolverFactory.Create(p);//工厂创建暴露引用
+                    var fieldResolver = fieldResolverFactory.Create(p);
                     var defaultValue = Activator.CreateInstance(nodeBehavior) as GOAPBehavior;
                     fieldResolver.Restore(defaultValue);
                     container.Add(fieldResolver.GetEditorField());
@@ -109,7 +109,7 @@ namespace Kurisu.GOAP.Editor
 
             return t.GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
                 .Where(field => field.GetCustomAttribute<SerializeField>() != null)
-                .Where(field => field.GetCustomAttribute<HideInInspector>() == null).Concat(GetAllFields(t.BaseType));//Concat合并列表
+                .Where(field => field.GetCustomAttribute<HideInInspector>() == null).Concat(GetAllFields(t.BaseType));
         }
         public void CleanUp()
         {

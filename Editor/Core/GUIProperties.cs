@@ -18,7 +18,7 @@ namespace Kurisu.GOAP.Editor
 
         public static Vector2 NodeSpacing()
         {
-            Vector2 guiNodeSize = GUIProperties.NodeSize();
+            Vector2 guiNodeSize = NodeSize();
             int padding = 20;
             return new Vector2(
                 guiNodeSize.x + padding,

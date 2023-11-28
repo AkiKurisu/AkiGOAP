@@ -8,7 +8,7 @@ namespace Kurisu.GOAP
     /// </summary>
     public abstract class GOAPAction : GOAPBehavior, IAction
     {
-        protected GOAPWorldState worldState;
+        protected WorldState worldState;
         // All of these states are removed from worldState when OnDeactivate is called
         private Dictionary<string, bool> temporaryState;
 
@@ -43,7 +43,7 @@ namespace Kurisu.GOAP
         /// Whether effect of this action can be set dynamically at runtime
         /// </summary>
         protected virtual bool DynamicSetEffect => false;
-        void IAction.Init(GOAPWorldState worldState)
+        void IAction.Init(WorldState worldState)
         {
             this.worldState = worldState;
             SetupDerived();
@@ -117,7 +117,7 @@ namespace Kurisu.GOAP
         /// </summary>
         /// <param name="worldState"></param>
         /// <returns></returns>
-        public bool PreconditionsSatisfied(GOAPWorldState worldState)
+        public bool PreconditionsSatisfied(WorldState worldState)
         {
             return worldState.IsSubset(Preconditions);
         }

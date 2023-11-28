@@ -10,7 +10,7 @@ namespace Kurisu.GOAP
     /// class GOAPPlannerPro
     /// Pro version using job system and burst compiler to support multi-thread
     /// </summary>
-    [RequireComponent(typeof(GOAPWorldState))]
+    [RequireComponent(typeof(WorldState))]
     public class GOAPPlannerPro : MonoBehaviour, IPlanner
     {
         [BurstCompile]
@@ -21,8 +21,8 @@ namespace Kurisu.GOAP
                 return y.GetPriority().CompareTo(x.GetPriority());
             }
         }
-        protected GOAPWorldState worldState;
-        public GOAPWorldState WorldState => worldState;
+        protected WorldState worldState;
+        public WorldState WorldState => worldState;
         protected readonly List<IGoal> goals = new();
         protected readonly List<IAction> actions = new();
         public IGoal ActivateGoal { get; private set; }
@@ -53,7 +53,7 @@ namespace Kurisu.GOAP
         internal bool SkipSearchWhenActionRunning => skipSearchWhenActionRunning;
         public List<GOAPBehavior> Behaviors => Enumerable.Empty<GOAPBehavior>().Concat(actions.OfType<GOAPBehavior>()).Concat(goals.OfType<GOAPBehavior>()).ToList();
         public Object Object => gameObject;
-        public event System.Action<IPlanner> OnUpdatePlanEvent;
+        public event System.Action<IPlanner> OnPlanUpdate;
         private GOAPJobRunner jobRunner;
         private bool isDirty = false;
         [SerializeField]
@@ -61,7 +61,7 @@ namespace Kurisu.GOAP
         private bool activateFlag = false;
         private void Awake()
         {
-            worldState = GetComponent<GOAPWorldState>();
+            worldState = GetComponent<WorldState>();
             isActive &= !tickType.HasFlag(TickType.ManualActivatePlanner);
         }
         private void Update()
@@ -101,7 +101,7 @@ namespace Kurisu.GOAP
                 debugUpdate = true;
             }
             if (debugUpdate)
-                OnUpdatePlanEvent?.Invoke(this);
+                OnPlanUpdate?.Invoke(this);
             else
             {
                 if (tickType.HasFlag(TickType.ManualActivatePlanner))
