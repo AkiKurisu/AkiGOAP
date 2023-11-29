@@ -56,6 +56,7 @@ namespace Kurisu.GOAP.Editor
         private IGoal ActiveGoal => planeCaches[currentIndex].activeGoal;
         private int ActiveActionIdx => planeCaches[currentIndex].activeActionIdx;
         private const int contentHeight = 400;
+        private float maxPriority = 1f;
         private class PlanCache
         {
             public IGoal activeGoal;
@@ -224,24 +225,26 @@ namespace Kurisu.GOAP.Editor
         private void DrawGoalPriorities()
         {
             if (planeCaches.Count == 0) return;
-            float maxPriorityRectWidth = contentRect.width - 10f;
+            float maxPriorityRectWidth = contentRect.width * 0.8f;
             GUILayout.Label("\n\n");
             GUI.color = runningTint;
             GUI.backgroundColor = backgroundNodeColor;
+            float max = maxPriority;
             for (int i = 0; i < GoalData.Count; i++)
             {
+                if (GoalData[i].priority > max) max = GoalData[i].priority;
                 GUI.Box(
                     new Rect(
                         0,
                         30f + i * prioritySpacing,
-                        Mathf.Clamp(GoalData[i].priority, 0.05f, 1f) * maxPriorityRectWidth,
+                        Mathf.Clamp(GoalData[i].priority / maxPriority, 0.05f, 1f) * maxPriorityRectWidth,
                         priorityRectHeight
                     ),
                     GoalData[i].goalName,
                     GoalData[i].canRun ? goalLabelStyle : disabledGoalLabelStyle
                 );
             }
-
+            maxPriority = max;
         }
         /// <summary>
         /// Draws an action plan as a series of labelled Rects linked together

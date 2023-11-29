@@ -123,11 +123,14 @@ namespace Kurisu.GOAP.Editor
             goals.ForEach(x => x.CleanUp());
             var activePlans = planner.ActivatePlan;
             var activeGoal = planner.ActivateGoal;
-            foreach (var action in activePlans)
+            if (activePlans.Count != 0)
             {
-                if (action is not GOAPAction goapAction) continue;
-                var t_Action = actions.First(x => x.GUID == goapAction.GUID);
-                (t_Action as GOAPActionNode).SetUp(goapAction.GetCost());
+                foreach (var action in activePlans)
+                {
+                    if (action is not GOAPAction goapAction) continue;
+                    var t_Action = actions.First(x => x.GUID == goapAction.GUID);
+                    (t_Action as GOAPActionNode).SetUp(goapAction.GetCost());
+                }
             }
             if (activeGoal is not GOAPGoal goapGoal) return;
             var t_Goal = goals.First(x => x.GUID == goapGoal.GUID);
