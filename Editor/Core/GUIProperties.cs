@@ -11,8 +11,8 @@ namespace Kurisu.GOAP.Editor
 
         //// Sizes
 
-        public static Vector2 NodeSize() { return new Vector2(200, 90); }
-        public static Vector2 TaskNodeSize() { return new Vector2(200, 80); }
+        public static Vector2 NodeSize() { return new Vector2(200, 70); }
+        public static Vector2 TaskNodeSize() { return new Vector2(200, 60); }
 
         //// Positions
 
@@ -67,7 +67,7 @@ namespace Kurisu.GOAP.Editor
 
         public static GUIStyle GUINodeStyle()
         {
-            GUIStyle nodeStyle = new GUIStyle();
+            GUIStyle nodeStyle = new();
             nodeStyle.normal.background = EditorGUIUtility.Load(
                 "builtin skins/lightskin/images/node0.png"
                 ) as Texture2D;
@@ -76,7 +76,7 @@ namespace Kurisu.GOAP.Editor
             nodeStyle.alignment = TextAnchor.UpperLeft;
             nodeStyle.fontStyle = FontStyle.Bold;
             nodeStyle.padding = new RectOffset(10, 0, 0, 0);
-            nodeStyle.fontSize = 14;
+            nodeStyle.fontSize = 12;
             return nodeStyle;
         }
 
@@ -91,7 +91,7 @@ namespace Kurisu.GOAP.Editor
 
         public static GUIStyle GUIPlannerStyle()
         {
-            GUIStyle nodeStyle = new GUIStyle();
+            GUIStyle nodeStyle = new();
             nodeStyle.normal.background = EditorGUIUtility.Load(
                 "builtin skins/lightskin/images/node0.png"
                 ) as Texture2D;
@@ -100,13 +100,13 @@ namespace Kurisu.GOAP.Editor
             nodeStyle.alignment = TextAnchor.UpperLeft;
             nodeStyle.fontStyle = FontStyle.Bold;
             nodeStyle.padding = new RectOffset(10, 0, 10, 0);
-            nodeStyle.fontSize = 12;
+            nodeStyle.fontSize = 10;
             return nodeStyle;
         }
 
         public static GUIStyle GoalLabelStyle()
         {
-            GUIStyle nodeStyle = new GUIStyle();
+            GUIStyle nodeStyle = new();
             nodeStyle.normal.background = EditorGUIUtility.Load(
                 "builtin skins/lightskin/images/node0.png"
                 ) as Texture2D;
@@ -115,7 +115,7 @@ namespace Kurisu.GOAP.Editor
             nodeStyle.normal.textColor = Color.white;
             nodeStyle.fontStyle = FontStyle.Bold;
             nodeStyle.padding = new RectOffset(10, 0, -5, 0);
-            nodeStyle.fontSize = 12;
+            nodeStyle.fontSize = 10;
             return nodeStyle;
         }
 

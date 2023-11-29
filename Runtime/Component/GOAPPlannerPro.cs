@@ -4,6 +4,8 @@ using System.Linq;
 using Kurisu.GOAP.Runner;
 using Kurisu.GOAP.Resolver;
 using Unity.Burst;
+using System;
+using Object = UnityEngine.Object;
 namespace Kurisu.GOAP
 {
     /// <summary>
@@ -53,7 +55,7 @@ namespace Kurisu.GOAP
         internal bool SkipSearchWhenActionRunning => skipSearchWhenActionRunning;
         public List<GOAPBehavior> Behaviors => Enumerable.Empty<GOAPBehavior>().Concat(actions.OfType<GOAPBehavior>()).Concat(goals.OfType<GOAPBehavior>()).ToList();
         public Object Object => gameObject;
-        public event System.Action<IPlanner> OnPlanUpdate;
+        public event Action<IPlanner> OnPlanUpdate;
         private GOAPJobRunner jobRunner;
         private bool isDirty = false;
         [SerializeField]
@@ -107,7 +109,7 @@ namespace Kurisu.GOAP
                 if (tickType.HasFlag(TickType.ManualActivatePlanner))
                 {
                     isActive = false;
-                    if (LogSearch) PlannerLog("Manual plan updating ends, need to be activated manully again.", bold: true);
+                    if (LogSearch) PlannerLog("Manual plan updating ends, need to be activated manually again.", bold: true);
                 }
             }
         }
@@ -142,7 +144,7 @@ namespace Kurisu.GOAP
                 candidatePlan.Clear();
                 candidateAction = null;
                 candidateGoal = null;
-                if (LogFail) PlannerLog("No candiate goal or path was found.");
+                if (LogFail) PlannerLog("No candidate goal or path was found.");
                 return;
             }
             var action = path[0];
@@ -223,7 +225,7 @@ namespace Kurisu.GOAP
             }
 
             // Plan no longer viable
-            if (!(ActivateAction.PreconditionsSatisfied(worldState)))
+            if (!ActivateAction.PreconditionsSatisfied(worldState))
             {
                 if (LogActive) ActivePlanLog(
                     $"{ActivateAction.Name} failed as preconditions are no longer satisfied",

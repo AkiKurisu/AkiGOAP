@@ -36,9 +36,9 @@ namespace Kurisu.GOAP.Editor
         private GUIContent goalContent;
 
         // Positions
-        private readonly float activePlanHeight = 30f;
-        private readonly float priorityRectHeight = 40f;
-        private readonly float prioritySpacing = 25f;
+        private readonly float activePlanHeight = 20f;
+        private readonly float priorityRectHeight = 30f;
+        private readonly float prioritySpacing = 20f;
 
         // Colors
         private Color backgroundNodeColor;
@@ -55,7 +55,7 @@ namespace Kurisu.GOAP.Editor
         private List<IAction> ActivePlan => planeCaches[currentIndex].activePlan;
         private IGoal ActiveGoal => planeCaches[currentIndex].activeGoal;
         private int ActiveActionIdx => planeCaches[currentIndex].activeActionIdx;
-        private const int contentHeight = 400;
+        private const int contentHeight = 250;
         private float maxPriority = 1f;
         private class PlanCache
         {
@@ -186,7 +186,7 @@ namespace Kurisu.GOAP.Editor
                 0,
                 0,
                 contentRect.width,
-                contentHeight * .4f
+                contentHeight * .43f
             );
             GUILayout.BeginArea(activePlanPanel, "Active Plan", panelStyle);
             DrawActionNodes();
@@ -199,9 +199,9 @@ namespace Kurisu.GOAP.Editor
             GUI.backgroundColor = panelColor;
             goalPrioritiesPanel = new Rect(
                 0,
-                contentHeight * .3f,
+                contentHeight * .4f,
                 contentRect.width,
-                contentHeight
+                contentHeight * .6f
             );
             GUILayout.BeginArea(goalPrioritiesPanel, "Goal Priorities", panelStyle);
             DrawGoalPriorities();
@@ -220,7 +220,7 @@ namespace Kurisu.GOAP.Editor
 
         /// <summary>
         /// Draws goals in priority order, where priority is 
-        /// visualised as a progress bar 
+        /// visualized as a progress bar 
         /// </summary>
         private void DrawGoalPriorities()
         {
@@ -283,7 +283,7 @@ namespace Kurisu.GOAP.Editor
                     "",
                     activeNodeStyle);
 
-                actionContent.text = "\nAction\n\n" + ActivePlan[i].Name;
+                actionContent.text = "\nAction\n" + ActivePlan[i].Name;
 
                 // Draw task rect
                 GUI.backgroundColor = actionColor;
@@ -308,7 +308,7 @@ namespace Kurisu.GOAP.Editor
                 "",
                 selectedNodeStyle);
             GUI.backgroundColor = goalColor;
-            goalContent.text = "\nGoal\n\n" + ActiveGoal.Name;
+            goalContent.text = "\nGoal\n" + ActiveGoal.Name;
             GUI.Box(
                 GetTaskRect(count),
                 goalContent,
