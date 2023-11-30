@@ -12,6 +12,7 @@ namespace Kurisu.GOAP.Editor
         private const string GoalIconPath = "Icons/goal_icon";
         private const string ActionIconPath = "Icons/action_icon";
         private readonly EditorWindow editorWindow;
+        public EditorWindow EditorWindow => editorWindow;
         internal System.Action<GOAPNode> onSelectAction;
         private readonly IGOAPSet set;
         public IGOAPSet Set => set;
@@ -39,7 +40,7 @@ namespace Kurisu.GOAP.Editor
             if (set is GOAPActionSet)
             {
                 var searchWindow = ScriptableObject.CreateInstance<ActionSearchWindowProvider>();
-                searchWindow.Init(editorWindow, this);
+                searchWindow.Init(this);
                 nodeCreationRequest += context =>
                 {
                     SearchWindow.Open(new SearchWindowContext(context.screenMousePosition), searchWindow);
@@ -48,7 +49,7 @@ namespace Kurisu.GOAP.Editor
             else if (set is GOAPGoalSet)
             {
                 var searchWindow = ScriptableObject.CreateInstance<GoalSearchWindowProvider>();
-                searchWindow.Init(editorWindow, this);
+                searchWindow.Init(this);
                 nodeCreationRequest += context =>
                 {
                     SearchWindow.Open(new SearchWindowContext(context.screenMousePosition), searchWindow);
@@ -57,7 +58,7 @@ namespace Kurisu.GOAP.Editor
             else
             {
                 var searchWindow = ScriptableObject.CreateInstance<GOAPNodeSearchWindow>();
-                searchWindow.Init(editorWindow, this);
+                searchWindow.Init(this);
                 nodeCreationRequest += context =>
                 {
                     SearchWindow.Open(new SearchWindowContext(context.screenMousePosition), searchWindow);
@@ -82,11 +83,11 @@ namespace Kurisu.GOAP.Editor
         }
         internal void Restore()
         {
-            goalStack = new GOAPGoalStack();
+            goalStack = new GOAPGoalStack(this);
             goalStack.SetPosition(new Rect(100, 300, 100, 100));
             goalStack.headerContainer.Add(new Image() { image = Resources.Load<Texture2D>(GoalIconPath) });
             goalStack.headerContainer.Add(new Label("   GOAP Goal Stack"));
-            actionStack = new GOAPActionStack();
+            actionStack = new GOAPActionStack(this);
             actionStack.SetPosition(new Rect(600, 300, 100, 100));
             actionStack.headerContainer.Add(new Image() { image = Resources.Load<Texture2D>(ActionIconPath) });
             actionStack.headerContainer.Add(new Label("   GOAP Action Stack"));
