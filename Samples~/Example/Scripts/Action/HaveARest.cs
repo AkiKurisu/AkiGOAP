@@ -27,6 +27,8 @@ namespace Kurisu.GOAP.Example
                 timer = 0;
                 agent.Energy = 100;
                 worldState.SetState("HaveEnergy", true);
+                //Reset signal state
+                worldState.SetState("CanRest", false);
             }
         }
         protected sealed override void OnActivateDerived()
@@ -38,8 +40,6 @@ namespace Kurisu.GOAP.Example
         protected sealed override void OnDeactivateDerived()
         {
             agent.NavMeshAgent.isStopped = false;
-            //Reset signal state
-            worldState.SetState("CanRest", false);
         }
     }
 }

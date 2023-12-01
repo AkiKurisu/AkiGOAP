@@ -32,8 +32,8 @@ namespace Kurisu.GOAP.Editor
                 myInspector.Add(stateLabel);
                 statesGroup = new VisualElement();
                 myInspector.Add(statesGroup);
-                if (StatesInfo.GetValue(localState) is not Dictionary<string, bool> states || states.Count == 0) return myInspector;
                 if (localState == null) return myInspector;
+                if (StatesInfo.GetValue(localState) is not Dictionary<string, bool> states || states.Count == 0) return myInspector;
                 RefreshStates();
             }
             return myInspector;

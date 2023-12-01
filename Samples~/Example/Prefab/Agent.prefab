@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: 7906561440970066325}
   - component: {fileID: 7906561440970066334}
   - component: {fileID: 7906561440970066335}
-  - component: {fileID: 7906561440970066332}
+  - component: {fileID: 2678565164902146169}
   m_Layer: 0
-  m_Name: Agent_Pro
+  m_Name: Agent
   m_TagString: Untagged
   m_Icon: {fileID: 5132851093641282708, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -122,7 +122,7 @@ NavMeshAgent:
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 0
---- !u!114 &7906561440970066332
+--- !u!114 &2678565164902146169
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -131,9 +131,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 7906561440970066327}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f3a8b05d3668bec49b50ead655e66f61, type: 3}
+  m_Script: {fileID: 11500000, guid: fce2b256593539e4287f39fb18ca9cce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  backendType: 1
   logType: 0
   tickType: 0
   skipSearchWhenActionRunning: 1

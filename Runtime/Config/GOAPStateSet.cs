@@ -50,6 +50,10 @@ namespace Kurisu.GOAP
             }
             return true;
         }
+        internal StateCache GetCache()
+        {
+            return StateCache.Get(states);
+        }
 #if UNITY_EDITOR
         /// <summary>
         /// In editor, we use OnValidate to init dictionary.

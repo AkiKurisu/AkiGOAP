@@ -22,7 +22,7 @@ namespace Kurisu.GOAP
         [SerializeReference]
         private List<GOAPBehavior> behaviors = new();
 #if UNITY_EDITOR
-        [Multiline(6), SerializeField]
+        [Multiline(6)]
         public string Description;
 #endif
         public List<GOAPBehavior> Behaviors => behaviors;

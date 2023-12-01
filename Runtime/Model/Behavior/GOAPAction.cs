@@ -16,9 +16,6 @@ namespace Kurisu.GOAP
         public Dictionary<string, bool> Preconditions { get; protected set; } = new Dictionary<string, bool>();
         // What will be in worldState when action completed
         public Dictionary<string, bool> Effects { get; protected set; } = new Dictionary<string, bool>();
-
-        // Absent key treated the same as key = false in preconditions and effects
-        protected virtual bool DefaultFalse => true;
         public virtual string Name => GetType().Name;
         private GOAPState[] _effects;
         public GOAPState[] EffectStates
@@ -62,11 +59,6 @@ namespace Kurisu.GOAP
         {
             return 0f;
         }
-        /// <summary>
-        /// Returns true if effects are a superset for conditions
-        /// </summary>
-        /// <param name="conditions"></param>
-        /// <returns></returns>
         public bool SatisfiesConditions(Dictionary<string, bool> conditions)
         {
             if (DynamicSetEffect)
@@ -74,33 +66,44 @@ namespace Kurisu.GOAP
                 Effects.Clear();
                 SetupEffects();
             }
+            int satisfyCounter = 0;
             foreach (var i in conditions)
             {
-                //If condition not in the effects
-                if (!Effects.ContainsKey(i.Key))
+                //To find a entry point, we only need to satisfy one condition
+                if (!Effects.TryGetValue(i.Key, out bool effectValue))
                 {
-                    if (DefaultFalse && i.Value == false) continue;
-                    else return false;
+                    continue;
                 }
-                if (Effects[i.Key] != i.Value)
+                if (effectValue != i.Value)
                 {
                     return false;
+                }
+                else
+                {
+                    ++satisfyCounter;
+                }
+            }
+            if (satisfyCounter == 0) return false;
+            //Should check the precondition will not create status collision
+            foreach (var preCondition in Preconditions)
+            {
+                if (conditions.TryGetValue(preCondition.Key, out bool value) && preCondition.Value != value)
+                {
+                    //Check this condition is fulfilled
+                    if (!Effects.TryGetValue(preCondition.Key, out bool effect) || effect != value)
+                    {
+                        return false;
+                    }
                 }
             }
             return true;
         }
-        /// <summary>
-        /// Called when selected by GOAPPlanner
-        /// </summary>
         public void OnActivate()
         {
             OnActivateDerived();
         }
 
         protected virtual void OnActivateDerived() { }
-        /// <summary>
-        /// Called by GOAPPlanner when action effects achieved or plan cancelled
-        /// </summary>
         public void OnDeactivate()
         {
             OnDeactivateDerived();
@@ -108,15 +111,7 @@ namespace Kurisu.GOAP
         }
 
         protected virtual void OnDeactivateDerived() { }
-        /// <summary>
-        /// Called every frame by GOAPPlanner
-        /// </summary>
         public virtual void OnTick() { }
-        /// <summary>
-        /// True if worldState is a superset of preconditions
-        /// </summary>
-        /// <param name="worldState"></param>
-        /// <returns></returns>
         public bool PreconditionsSatisfied(WorldState worldState)
         {
             return worldState.IsSubset(Preconditions);

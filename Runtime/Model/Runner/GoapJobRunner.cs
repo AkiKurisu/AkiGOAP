@@ -7,7 +7,7 @@ namespace Kurisu.GOAP.Runner
 {
     public class GOAPJobRunner
     {
-        private readonly GOAPPlannerPro planner;
+        private readonly JobSystemBackend backend;
         private readonly IGraphResolver resolver;
         private readonly List<JobRunHandle> resolveHandles = new();
         private readonly IExecutableBuilder executableBuilder;
@@ -15,9 +15,9 @@ namespace Kurisu.GOAP.Runner
         private readonly ICostBuilder costBuilder;
         private readonly IConditionBuilder conditionBuilder;
         private List<IAction> resultCache = new();
-        public GOAPJobRunner(GOAPPlannerPro planner, IGraphResolver graphResolver)
+        public GOAPJobRunner(JobSystemBackend backend, IGraphResolver graphResolver)
         {
-            this.planner = planner;
+            this.backend = backend;
             resolver = graphResolver;
 
             executableBuilder = resolver.GetExecutableBuilder();
@@ -29,20 +29,20 @@ namespace Kurisu.GOAP.Runner
         public void Run()
         {
             resolveHandles.Clear();
-            RunInternal(planner);
+            RunInternal(backend);
         }
 
-        private void RunInternal(GOAPPlannerPro planner)
+        private void RunInternal(JobSystemBackend backend)
         {
-            if (planner == null)
+            if (backend == null)
                 return;
-            if (planner.CandidateGoals.Count == 0)
+            if (backend.CandidateGoals.Count == 0)
                 return;
-            if (planner.ActivateAction != null && planner.SkipSearchWhenActionRunning)
+            if (backend.ActivateAction != null && backend.BackendHost.SkipSearchWhenActionRunning)
                 return;
-            FillBuilders(planner, planner.transform);
+            FillBuilders(backend, backend.BackendHost.Transform);
             //Create job for each candidate goal
-            foreach (var goal in planner.CandidateGoals)
+            foreach (var goal in backend.CandidateGoals)
                 resolveHandles.Add(new JobRunHandle(goal, resolver.StartResolve(new RunData
                 {
                     StartIndex = resolver.GetIndex(goal),
@@ -54,18 +54,18 @@ namespace Kurisu.GOAP.Runner
                 })));
         }
 
-        private void FillBuilders(IPlanner agent, Transform transform)
+        private void FillBuilders(JobSystemBackend backend, Transform transform)
         {
             executableBuilder.Clear();
             positionBuilder.Clear();
             conditionBuilder.Clear();
 
-            foreach (var node in agent.GetAllActions())
+            foreach (var node in backend.Actions)
             {
                 var allMet = true;
                 foreach (var condition in node.ConditionStates)
                 {
-                    if (!agent.WorldState.InSet(condition.Key, condition.Value))
+                    if (!backend.BackendHost.WorldState.InSet(condition.Key, condition.Value))
                     {
                         allMet = false;
                         continue;
@@ -74,7 +74,9 @@ namespace Kurisu.GOAP.Runner
                 }
                 executableBuilder.SetExecutable(node, allMet);
                 costBuilder.SetCost(node, node.GetCost());
-                positionBuilder.SetPosition(node, agent.WorldState.ResolveNodeTarget(node)?.position ?? transform.position);
+                Transform target = backend.BackendHost.WorldState.ResolveNodeTarget(node);
+                Vector3 position = target != null ? target.position : transform.position;
+                positionBuilder.SetPosition(node, position);
             }
         }
         public void Complete()
@@ -90,24 +92,24 @@ namespace Kurisu.GOAP.Runner
                 }
                 resultCache.Clear();
                 resolveHandle.Handle.CompleteNonAlloc(ref resultCache);
-                if (planner == null)
+                if (backend == null)
                     continue;
                 if (resultCache.Count != 0)
                 {
                     //Get candidate goal and action with highest priority
-                    planner.SetCandidate(resultCache, resolveHandle.Goal);
+                    backend.SetCandidate(resultCache, resolveHandle.Goal);
                     //If not find, thus fall back to next handle
                     find = true;
                 }
             }
             resolveHandles.Clear();
             if (!find)
-                planner.SetCandidate(resultCache, null);
+                backend.SetCandidate(resultCache, null);
         }
 
         public void Dispose()
         {
-            foreach (var resolveHandle in this.resolveHandles)
+            foreach (var resolveHandle in resolveHandles)
             {
                 resolveHandle.Handle.CompleteNonAlloc(ref resultCache);
             }

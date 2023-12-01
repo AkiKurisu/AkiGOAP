@@ -10,10 +10,29 @@ namespace Kurisu.GOAP
     {
         float GetCost();
         void Init(WorldState worldState);
+        /// <summary>
+        /// Returns true if effects are a superset for conditions
+        /// </summary>
+        /// <param name="conditions"></param>
+        /// <returns></returns>
         bool SatisfiesConditions(Dictionary<string, bool> conditions);
+        /// <summary>
+        /// True if worldState is a superset of preconditions
+        /// </summary>
+        /// <param name="worldState"></param>
+        /// <returns></returns>
         bool PreconditionsSatisfied(WorldState worldState);
+        /// <summary>
+        /// Called every frame by GOAPPlanner
+        /// </summary>
         void OnTick();
+        /// <summary>
+        /// Called when selected by GOAPPlanner
+        /// </summary>
         void OnActivate();
+        /// <summary>
+        /// Called by GOAPPlanner when action effects achieved or plan cancelled
+        /// </summary>
         void OnDeactivate();
         public Dictionary<string, bool> Preconditions { get; }
         // What will be in worldState when action completed

@@ -13,41 +13,41 @@ MonoBehaviour:
   m_Name: Example2
   m_EditorClassIdentifier: 
   behaviors:
-  - rid: 3405912228218798111
-  - rid: 3405912228218798112
-  - rid: 3405912228218798113
-  - rid: 3405912228218798114
-  - rid: 3405912228218798115
-  - rid: 3405912228218798116
+  - rid: 5030606575037317122
+  - rid: 5030606575037317123
+  - rid: 5030606575037317124
+  - rid: 5030606575037317125
+  - rid: 5030606575037317126
+  - rid: 5030606575037317127
   Description: "GOAP Like Example\n\u8BE5Agent\u5728\u62E5\u6709\u80FD\u91CF\u4F7F\u4F1A\u8FFD\u9010\u73A9\u5BB6\n\u5982\u679C\u6CA1\u6709\u80FD\u91CF\u5219\u5230\u4E00\u4E2A\u5C31\u8FD1\u7684\u4F11\u606F\u70B9\u6062\u590D\u80FD\u91CF\nThe
     Agent will chase the player if it has power\r\nIf there is no energy, go to a
     nearby rest point to restore energy"
   references:
     version: 2
     RefIds:
-    - rid: 3405912228218798111
+    - rid: 5030606575037317122
       type: {class: IdleCloseToPlayer, ns: Kurisu.GOAP.Example, asm: Kurisu.GOAP.Example}
       data:
         guid: 9adba686-fe7d-4a59-a9a6-b60707535f60
         distance: 4
         minAmount: 0
-    - rid: 3405912228218798112
+    - rid: 5030606575037317123
       type: {class: GoToTent, ns: Kurisu.GOAP.Example, asm: Kurisu.GOAP.Example}
       data:
         guid: a20e1561-b935-4562-b884-5258d73a6c9f
-    - rid: 3405912228218798113
+    - rid: 5030606575037317124
       type: {class: GoToHome, ns: Kurisu.GOAP.Example, asm: Kurisu.GOAP.Example}
       data:
         guid: 16795218-b6c8-415e-9afd-9a7faef76151
-    - rid: 3405912228218798114
+    - rid: 5030606575037317125
       type: {class: Idle, ns: Kurisu.GOAP.Example, asm: Kurisu.GOAP.Example}
       data:
         guid: 4b8d6a65-0357-40f3-8d23-f75643015727
-    - rid: 3405912228218798115
+    - rid: 5030606575037317126
       type: {class: GoToPlayer, ns: Kurisu.GOAP.Example, asm: Kurisu.GOAP.Example}
       data:
         guid: 54c96557-6d9c-4871-91e5-f6cf65fc4e15
-    - rid: 3405912228218798116
+    - rid: 5030606575037317127
       type: {class: HaveARest, ns: Kurisu.GOAP.Example, asm: Kurisu.GOAP.Example}
       data:
         guid: 87a5de57-f8e0-482d-a3dd-610463389d0c
