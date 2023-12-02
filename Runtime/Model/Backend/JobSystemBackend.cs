@@ -69,6 +69,10 @@ namespace Kurisu.GOAP
             GetHighestPriorityGoals(candidateGoals);
             jobRunner?.Run();
         }
+        public override void OnDisable()
+        {
+            jobRunner?.Complete();
+        }
         public override void LateUpdate()
         {
             if (!IsActive) return;

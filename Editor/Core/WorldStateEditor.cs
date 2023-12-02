@@ -16,10 +16,12 @@ namespace Kurisu.GOAP.Editor
         private const string Global = "Global";
         private const string Local = "Local";
         private VisualElement statesGroup;
-        private static readonly FieldInfo StatesInfo = typeof(GOAPStateSet).GetField("states", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
+        private VisualElement myInspector;
+        private static readonly FieldInfo StatesInfo = typeof(GOAPStateSet)
+                                                        .GetField("states", BindingFlags.NonPublic | BindingFlags.Instance);
         public override VisualElement CreateInspectorGUI()
         {
-            var myInspector = new VisualElement();
+            myInspector = new VisualElement();
             var state = target as WorldState;
             myInspector.Add(UIUtility.GetLabel(LabelText, 20));
             InspectorElement.FillDefaultInspector(myInspector, serializedObject, this);
@@ -52,6 +54,11 @@ namespace Kurisu.GOAP.Editor
         }
         private void RefreshStates()
         {
+            if (statesGroup == null)
+            {
+                Repaint();
+                return;
+            }
             statesGroup.Clear();
             var state = target as WorldState;
             var localState = state != null ? state.LocalState : null;

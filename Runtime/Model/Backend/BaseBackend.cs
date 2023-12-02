@@ -23,6 +23,7 @@ namespace Kurisu.GOAP
         public List<IAction> Actions { get; } = new(Capacity);
         public List<IGoal> Goals { get; } = new(Capacity);
         public abstract void ManualActivate();
+        public virtual void OnDisable() { }
         public virtual void LateUpdate() { }
         public abstract void Update();
         private readonly IBackendHost backendHost;

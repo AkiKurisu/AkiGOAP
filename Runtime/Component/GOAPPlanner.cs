@@ -129,6 +129,10 @@ namespace Kurisu.GOAP
         {
             backend.LateUpdate();
         }
+        private void OnDisable()
+        {
+            backend.OnDisable();
+        }
         private void OnDestroy()
         {
             backend.Dispose();

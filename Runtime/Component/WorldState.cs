@@ -27,9 +27,16 @@ namespace Kurisu.GOAP
 #if UNITY_EDITOR
         //Editor hook for UIElement update
         internal Action OnUpdate;
-        private void Update()
+        private double lastTickTime;
+        private void NotifyEditor()
         {
-            OnUpdate?.Invoke();
+
+            double currentTime = Time.timeSinceLevelLoad;
+            if (currentTime - lastTickTime >= 1f)
+            {
+                lastTickTime = currentTime;
+                OnUpdate?.Invoke();
+            }
         }
 #endif
         protected void Awake()
@@ -73,6 +80,9 @@ namespace Kurisu.GOAP
             {
                 localState.AddState(name, value);
             }
+#if UNITY_EDITOR
+            NotifyEditor();
+#endif
         }
 
         public void RemoveState(string name, bool includeGlobal = true)
@@ -85,6 +95,9 @@ namespace Kurisu.GOAP
             {
                 localState.RemoveState(name);
             }
+#if UNITY_EDITOR
+            NotifyEditor();
+#endif
         }
 
         public bool GetState(string name, bool includeGlobal = true)
