@@ -15,8 +15,7 @@ namespace Kurisu.GOAP.Resolver
         public float G;
         public float H;
         public int ParentIndex;
-
-        public float F => G + H;
+        public readonly float F => G + H;
     }
 
     [BurstCompile]
@@ -35,7 +34,7 @@ namespace Kurisu.GOAP.Resolver
     [BurstCompile]
     public struct NodeSorter : IComparer<NodeData>
     {
-        public int Compare(NodeData x, NodeData y)
+        public readonly int Compare(NodeData x, NodeData y)
         {
             return x.F.CompareTo(y.F);
         }
@@ -80,7 +79,6 @@ namespace Kurisu.GOAP.Resolver
                 ParentIndex = -1
             };
             openSet.Add(runData.StartIndex, nodeData);
-
             while (!openSet.IsEmpty)
             {
                 var openList = openSet.GetValueArray(Allocator.Temp);
@@ -97,6 +95,12 @@ namespace Kurisu.GOAP.Resolver
                 closedSet.TryAdd(currentNode.Index, currentNode);
                 openSet.Remove(currentNode.Index);
 
+                // If this node has a condition that is false and has no connections, it is unresolvable
+                if (HasUnresolvableCondition(currentNode.Index))
+                {
+                    continue;
+                }
+
                 foreach (var conditionIndex in NodeConditions.GetValuesForKey(currentNode.Index))
                 {
                     if (runData.ConditionsMet[conditionIndex])
@@ -112,7 +116,7 @@ namespace Kurisu.GOAP.Resolver
                         }
 
                         var newG = currentNode.G + RunData.Costs[neighborIndex];
-
+                        // Current neighbor is not in the open set
                         if (!openSet.TryGetValue(neighborIndex, out NodeData neighbor))
                         {
                             neighbor = new NodeData
@@ -126,6 +130,7 @@ namespace Kurisu.GOAP.Resolver
                             continue;
                         }
 
+                        // This neighbor has a lower cost
                         if (newG < neighbor.G)
                         {
                             neighbor.G = newG;
@@ -168,6 +173,24 @@ namespace Kurisu.GOAP.Resolver
                 path.Add(currentNode);
                 currentNode = closedSet[currentNode.ParentIndex];
             }
+        }
+
+        private bool HasUnresolvableCondition(int currentIndex)
+        {
+            foreach (var conditionIndex in NodeConditions.GetValuesForKey(currentIndex))
+            {
+                if (RunData.ConditionsMet[conditionIndex])
+                {
+                    continue;
+                }
+
+                if (!ConditionConnections.GetValuesForKey(conditionIndex).MoveNext())
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

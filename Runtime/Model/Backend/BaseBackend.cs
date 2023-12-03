@@ -34,12 +34,9 @@ namespace Kurisu.GOAP
         }
         public void TickGoals()
         {
-            if (Goals != null)
+            for (int i = 0; i < Goals.Count; i++)
             {
-                for (int i = 0; i < Goals.Count; i++)
-                {
-                    Goals[i].OnTick();
-                }
+                Goals[i].OnTick();
             }
         }
         protected void ActivePlanLog(object message, bool bold = false)

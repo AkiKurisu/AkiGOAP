@@ -27,7 +27,7 @@ namespace Kurisu.GOAP
         private readonly List<IAction> candidatePlan = new(Capacity);
         private readonly List<IGoal> candidateGoals = new(Capacity);
         public List<IGoal> CandidateGoals => candidateGoals;
-        protected IAction activateAction;
+        private IAction activateAction;
         public IAction ActivateAction => activateAction;
         public override int ActiveActionIndex => 0;
         public override List<IAction> ActivatePlan { get; } = new(Capacity);
@@ -122,6 +122,7 @@ namespace Kurisu.GOAP
                     if (LogFail) PlannerLog($"{Goals[i].Name} not valid as preconditions not satisfied");
                     continue;
                 }
+                if (LogSearch) PlannerLog($"Add candidate goal {Goals[i].Name}", bold: true);
                 chosenGoals.Add(Goals[i]);
             }
             chosenGoals.Sort(new GoalSorter());
@@ -139,9 +140,9 @@ namespace Kurisu.GOAP
             var action = path[0];
             candidatePlan.Clear();
             candidatePlan.AddRange(path);
-            if (candidateAction != action && LogSearch) PlannerLog($"Search candidate action:{action.Name}");
+            if (candidateAction != action && LogSearch) PlannerLog($"Set candidate action:{action.Name}");
             candidateAction = action;
-            if (candidateGoal != goal && LogSearch) PlannerLog($"Search candidate goal:{goal.Name}");
+            if (candidateGoal != goal && LogSearch) PlannerLog($"Set candidate goal:{goal.Name}");
             candidateGoal = goal;
         }
 
