@@ -14,7 +14,6 @@ namespace Kurisu.GOAP.Editor
     public class SnapshotView : VisualElement
     {
         private readonly IPlanner planner; // The planner being visualised
-
         private Rect activePlanPanel;
         private Rect goalPrioritiesPanel;
 
@@ -48,7 +47,6 @@ namespace Kurisu.GOAP.Editor
         private Color defaultTint;
         private Color linkColor;
         private Color panelColor;
-
         private readonly List<PlanCache> planeCaches = new(50);
         private int currentIndex;
         private List<GoalData> GoalData => planeCaches[currentIndex].goalData;
@@ -68,6 +66,8 @@ namespace Kurisu.GOAP.Editor
         {
             this.planner = planner;
             planner.OnPlanUpdate += CachePlan;
+            //Re-Register if editor window changed
+            RegisterCallback<AttachToPanelEvent>((evt) => { planner.OnPlanUpdate -= CachePlan; planner.OnPlanUpdate += CachePlan; });
             RegisterCallback<DetachFromPanelEvent>((evt) => planner.OnPlanUpdate -= CachePlan);
             Add(GetIMGUIContainer());
             SetupPanels();
