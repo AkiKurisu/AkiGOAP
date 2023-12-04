@@ -4,21 +4,21 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using System.Linq;
 using System.Collections.Generic;
+using System;
 namespace Kurisu.GOAP.Editor
 {
     public class GOAPView : GraphView
     {
         private const string GraphStyleSheetPath = "AkiGOAP/Graph";
-        private const string GoalIconPath = "Icons/goal_icon";
-        private const string ActionIconPath = "Icons/action_icon";
         private readonly EditorWindow editorWindow;
         public EditorWindow EditorWindow => editorWindow;
-        internal System.Action<GOAPNode> onSelectAction;
+        internal Action<GOAPNode> onSelectAction;
         private readonly IGOAPSet set;
         public IGOAPSet Set => set;
         private readonly NodeResolver nodeResolver = new();
         private GOAPNodeStack goalStack;
         private GOAPNodeStack actionStack;
+        private GOAPPlanStack planStack;
         public GOAPView(EditorWindow editor, IGOAPSet set)
         {
             this.set = set;
@@ -84,13 +84,22 @@ namespace Kurisu.GOAP.Editor
         internal void Restore()
         {
             goalStack = new GOAPGoalStack(this);
-            goalStack.SetPosition(new Rect(100, 300, 100, 100));
-            goalStack.headerContainer.Add(new Image() { image = Resources.Load<Texture2D>(GoalIconPath) });
-            goalStack.headerContainer.Add(new Label("   GOAP Goal Stack"));
             actionStack = new GOAPActionStack(this);
-            actionStack.SetPosition(new Rect(600, 300, 100, 100));
-            actionStack.headerContainer.Add(new Image() { image = Resources.Load<Texture2D>(ActionIconPath) });
-            actionStack.headerContainer.Add(new Label("   GOAP Action Stack"));
+            if (set is IPlanner planner)
+            {
+                //Add plan stack
+                planStack = new GOAPPlanStack(this);
+                planStack.SetPosition(new Rect(400, 300, 100, 100));
+                AddElement(planStack);
+                planner.OnPlanUpdate += UpdateView;
+                goalStack.SetPosition(new Rect(-100, 300, 100, 100));
+                actionStack.SetPosition(new Rect(900, 300, 100, 100));
+            }
+            else
+            {
+                goalStack.SetPosition(new Rect(100, 300, 100, 100));
+                actionStack.SetPosition(new Rect(600, 300, 100, 100));
+            }
             AddElement(goalStack);
             AddElement(actionStack);
             if (set is GOAPActionSet)
@@ -110,14 +119,11 @@ namespace Kurisu.GOAP.Editor
                 else goalStack.AddElement(node);
                 node.onSelectAction = onSelectAction;
             }
-            if (set is IPlanner)
-            {
-                IPlanner planner = set as IPlanner;
-                planner.OnPlanUpdate += UpdateView;
-            }
         }
         private void UpdateView(IPlanner planner)
         {
+            planStack.Query<GOAPActionNode>().ForEach(x => actionStack.AddElement(x));
+            planStack.Query<GOAPGoalNode>().ForEach(x => goalStack.AddElement(x));
             var actions = actionStack.Query<GOAPNode>().ToList();
             actions.ForEach(x => x.CleanUp());
             var goals = goalStack.Query<GOAPNode>().ToList();
@@ -130,17 +136,19 @@ namespace Kurisu.GOAP.Editor
                 {
                     if (action is not GOAPAction goapAction) continue;
                     var t_Action = actions.First(x => x.GUID == goapAction.GUID);
-                    (t_Action as GOAPActionNode).SetUp(goapAction.GetCost());
+                    (t_Action as GOAPActionNode).SetUp(goapAction);
+                    planStack.AddElement(t_Action);
                 }
             }
             if (activeGoal is not GOAPGoal goapGoal) return;
             var t_Goal = goals.First(x => x.GUID == goapGoal.GUID);
-            (t_Goal as GOAPGoalNode).SetUp(goapGoal.GetPriority(), goapGoal.PreconditionsSatisfied(planner.WorldState), true);
+            (t_Goal as GOAPGoalNode).SetUp(goapGoal, goapGoal.PreconditionsSatisfied(planner.WorldState), true);
+            planStack.InsertElement(0, t_Goal);
             foreach (var goal in goals)
             {
                 if (goal == t_Goal) continue;
                 var goalBehavior = planner.Behaviors.First(x => x.GUID == goal.GUID) as GOAPGoal;
-                (goal as GOAPGoalNode).SetUp(goalBehavior.GetPriority(), goalBehavior.PreconditionsSatisfied(planner.WorldState), false);
+                (goal as GOAPGoalNode).SetUp(goalBehavior, goalBehavior.PreconditionsSatisfied(planner.WorldState), false);
             }
         }
         internal void Save()

@@ -31,7 +31,14 @@ namespace Kurisu.GOAP.Editor
             {
                 tooltip = BackendTooltip
             };
-            backend.RegisterValueChangedCallback((e) => OnBackendChanged((PlannerBackend)e.newValue));
+            if (Application.isPlaying)
+            {
+                backend.SetEnabled(false);
+            }
+            else
+            {
+                backend.RegisterValueChangedCallback((e) => OnBackendChanged((PlannerBackend)e.newValue));
+            }
             myInspector.Add(backend);
             //Default
             InspectorElement.FillDefaultInspector(myInspector, serializedObject, this);

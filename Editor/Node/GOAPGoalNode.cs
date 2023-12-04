@@ -1,25 +1,45 @@
+using System.Text;
 using UnityEngine;
 using UnityEngine.UIElements;
-
 namespace Kurisu.GOAP.Editor
 {
     public class GOAPGoalNode : GOAPNode
     {
         public GOAPGoalNode() : base()
         {
-            label.style.color = Color.black;
+            priorityLabel = new();
+            priorityLabel.style.color = Color.black;
+            priorityLabel.style.fontSize = 14;
+            stateLabel = new()
+            {
+                enableRichText = true
+            };
+            stateLabel.style.color = Color.white;
+            stateLabel.style.fontSize = 12;
         }
-        private readonly Label label = new();
-
+        private readonly Label priorityLabel;
+        private readonly Label stateLabel;
         protected sealed override void OnCleanUp()
         {
-            titleContainer.Remove(label);
+            priorityLabel.RemoveFromHierarchy();
+            stateLabel.RemoveFromHierarchy();
         }
-        public void SetUp(float priority, bool canRun, bool isCurrent)
+        public void SetUp(GOAPGoal goal, bool canRun, bool isCurrent)
         {
-            if (canRun) style.backgroundColor = isCurrent ? Color.green : Color.yellow;
-            label.text = $"Priority : {priority}";
-            titleContainer.Add(label);
+            if (canRun) SetStyle(isCurrent);
+            priorityLabel.text = $"Priority : {goal.GetPriority()}";
+            StringBuilder stringBuilder = new();
+            stringBuilder.AppendLine("<b>Conditions</b>:");
+            foreach (var state in goal.ConditionStates)
+            {
+                stringBuilder.Append(state.Key);
+                stringBuilder.Append(":");
+                stringBuilder.AppendLine(state.Value.ToString());
+            }
+            if (stringBuilder[^1] == '\n') stringBuilder.Remove(stringBuilder.Length - 1, 1);
+            stateLabel.text = stringBuilder.ToString();
+            titleContainer.Add(priorityLabel);
+            mainContainer.Add(stateLabel);
         }
     }
 }

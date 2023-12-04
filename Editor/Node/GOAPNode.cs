@@ -54,7 +54,7 @@ namespace Kurisu.GOAP.Editor
         }
         private GOAPBehavior ReplaceBehavior()
         {
-            this.NodeBehavior = Activator.CreateInstance(GetBehavior()) as GOAPBehavior;
+            NodeBehavior = Activator.CreateInstance(GetBehavior()) as GOAPBehavior;
             return NodeBehavior;
         }
         public Type GetBehavior()
@@ -113,9 +113,23 @@ namespace Kurisu.GOAP.Editor
         }
         public void CleanUp()
         {
-            style.backgroundColor = new StyleColor(StyleKeyword.Null);
+            RemoveFromClassList("IsRunning");
+            RemoveFromClassList("IsCurrent");
+            OnCleanUp();
         }
         protected virtual void OnCleanUp() { }
-
+        protected void SetStyle(bool isCurrent)
+        {
+            if (isCurrent)
+            {
+                RemoveFromClassList("IsRunning");
+                AddToClassList("IsCurrent");
+            }
+            else
+            {
+                RemoveFromClassList("IsCurrent");
+                AddToClassList("IsRunning");
+            }
+        }
     }
 }

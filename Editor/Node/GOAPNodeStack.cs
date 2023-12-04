@@ -17,10 +17,20 @@ namespace Kurisu.GOAP.Editor
             headerContainer.style.justifyContent = Justify.Center;
         }
     }
+    public class GOAPPlanStack : GOAPNodeStack
+    {
+        public GOAPPlanStack(GOAPView graphView) : base(graphView)
+        {
+            headerContainer.Add(new Label("   Plan Stack"));
+        }
+    }
     public class GOAPActionStack : GOAPNodeStack
     {
+        private const string ActionIconPath = "Icons/action_icon";
         public GOAPActionStack(GOAPView graphView) : base(graphView)
         {
+            headerContainer.Add(new Image() { image = Resources.Load<Texture2D>(ActionIconPath) });
+            headerContainer.Add(new Label("   Action Stack"));
         }
 
         protected override void OnSeparatorContextualMenuEvent(ContextualMenuPopulateEvent evt, int separatorIndex)
@@ -39,15 +49,20 @@ namespace Kurisu.GOAP.Editor
             if (element is GOAPActionNode actionNode)
             {
                 var behaviorType = actionNode.GetBehavior();
-                return contentContainer.Query<GOAPActionNode>().ToList().FirstOrDefault(x => x.GetBehavior() == behaviorType) == null;
+                return contentContainer.Query<GOAPActionNode>()
+                                        .ToList()
+                                        .FirstOrDefault(x => x.GetBehavior() == behaviorType) == null;
             }
             return false;
         }
     }
     public class GOAPGoalStack : GOAPNodeStack
     {
+        private const string GoalIconPath = "Icons/goal_icon";
         public GOAPGoalStack(GOAPView graphView) : base(graphView)
         {
+            headerContainer.Add(new Image() { image = Resources.Load<Texture2D>(GoalIconPath) });
+            headerContainer.Add(new Label("   Goal Stack"));
         }
         protected override void OnSeparatorContextualMenuEvent(ContextualMenuPopulateEvent evt, int separatorIndex)
         {
@@ -65,7 +80,9 @@ namespace Kurisu.GOAP.Editor
             if (element is GOAPGoalNode actionNode)
             {
                 var behaviorType = actionNode.GetBehavior();
-                return contentContainer.Query<GOAPGoalNode>().ToList().FirstOrDefault(x => x.GetBehavior() == behaviorType) == null;
+                return contentContainer.Query<GOAPGoalNode>()
+                                        .ToList()
+                                        .FirstOrDefault(x => x.GetBehavior() == behaviorType) == null;
             }
             return false;
         }

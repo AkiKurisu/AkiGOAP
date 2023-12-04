@@ -34,7 +34,10 @@ namespace Kurisu.GOAP.Editor
         private void AddTypeEntry(Type addType, List<SearchTreeEntry> entries)
         {
             entries.Add(new SearchTreeGroupEntry(new GUIContent($"Select {addType.Name}"), 1));
-            List<Type> nodeTypes = SearchUtility.FindSubClassTypes(addType);
+            List<Type> nodeTypes = SearchUtility.FindSubClassTypes(addType)
+                                    .Except(view.nodes.OfType<GOAPNode>()
+                                    .Select(x => x.GetBehavior()))
+                                    .ToList();
             var groups = nodeTypes.GroupsByGroup();
             nodeTypes = nodeTypes.Except(groups.SelectMany(x => x)).ToList();
             foreach (var group in groups)
@@ -81,7 +84,10 @@ namespace Kurisu.GOAP.Editor
             Dictionary<string, List<Type>> attributeDict = new();
 
             entries.Add(new SearchTreeGroupEntry(new GUIContent($"Select {typeof(T).Name}"), 0));
-            List<Type> nodeTypes = SearchUtility.FindSubClassTypes(typeof(T));
+            List<Type> nodeTypes = SearchUtility.FindSubClassTypes(typeof(T))
+                                    .Except(view.nodes.OfType<GOAPNode>()
+                                    .Select(x => x.GetBehavior()))
+                                    .ToList();
             var groups = nodeTypes.GroupsByGroup();
             nodeTypes = nodeTypes.Except(groups.SelectMany(x => x)).ToList();
             foreach (var group in groups)
