@@ -60,10 +60,10 @@ namespace Kurisu.GOAP.Runner
             positionBuilder.Clear();
             conditionBuilder.Clear();
 
-            foreach (var node in backend.Actions)
+            foreach (var action in backend.Actions)
             {
                 var allMet = true;
-                foreach (var condition in node.ConditionStates)
+                foreach (var condition in action.ConditionStates)
                 {
                     if (!backend.BackendHost.WorldState.InSet(condition.Key, condition.Value))
                     {
@@ -72,11 +72,11 @@ namespace Kurisu.GOAP.Runner
                     }
                     conditionBuilder.SetConditionMet(condition, true);
                 }
-                executableBuilder.SetExecutable(node, allMet);
-                costBuilder.SetCost(node, node.GetCost());
-                Transform target = backend.BackendHost.WorldState.ResolveNodeTarget(node);
+                executableBuilder.SetExecutable(action, allMet);
+                costBuilder.SetCost(action, action.GetCost());
+                Transform target = backend.BackendHost.WorldState.ResolveNodeTarget(action);
                 Vector3 position = target != null ? target.position : transform.position;
-                positionBuilder.SetPosition(node, position);
+                positionBuilder.SetPosition(action, position);
             }
         }
         public void Complete()

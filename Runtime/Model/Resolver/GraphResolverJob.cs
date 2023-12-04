@@ -179,11 +179,12 @@ namespace Kurisu.GOAP.Resolver
         {
             foreach (var conditionIndex in NodeConditions.GetValuesForKey(currentIndex))
             {
+                //Already fit current world state
                 if (RunData.ConditionsMet[conditionIndex])
                 {
                     continue;
                 }
-
+                //No node fit condition
                 if (!ConditionConnections.GetValuesForKey(conditionIndex).MoveNext())
                 {
                     return true;

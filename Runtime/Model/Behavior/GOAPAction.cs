@@ -9,9 +9,6 @@ namespace Kurisu.GOAP
     public abstract class GOAPAction : GOAPBehavior, IAction
     {
         protected WorldState worldState;
-        // All of these states are removed from worldState when OnDeactivate is called
-        private Dictionary<string, bool> temporaryState;
-
         // What must be in worldState for the action to run
         public Dictionary<string, bool> Preconditions { get; protected set; } = new Dictionary<string, bool>();
         // What will be in worldState when action completed
@@ -24,9 +21,13 @@ namespace Kurisu.GOAP
             {
                 if (DynamicSetEffect)
                 {
+                    foreach (var effect in _effects)
+                    {
+                        effect.Pooled();
+                    }
                     Effects.Clear();
                     SetupEffects();
-                    _effects = Effects.Select(x => new GOAPState(x)).ToArray();
+                    _effects = Effects.Select(x => GOAPState.Get(x)).ToArray();
                 }
                 return _effects;
             }
@@ -45,15 +46,10 @@ namespace Kurisu.GOAP
             this.worldState = worldState;
             SetupDerived();
             SetupEffects();
-            if (!DynamicSetEffect) EffectStates = Effects.Select(x => new GOAPState(x)).ToArray();
-            ConditionStates = Preconditions.Select(x => new GOAPState(x)).ToArray();
-            ResetTemporaryState();
+            if (!DynamicSetEffect) EffectStates = Effects.Select(x => GOAPState.Get(x)).ToArray();
+            ConditionStates = Preconditions.Select(x => GOAPState.Get(x)).ToArray();
         }
 
-        private void ResetTemporaryState()
-        {
-            temporaryState = new Dictionary<string, bool>();
-        }
 
         public virtual float GetCost()
         {
@@ -107,7 +103,6 @@ namespace Kurisu.GOAP
         public void OnDeactivate()
         {
             OnDeactivateDerived();
-            ClearTemporaryStates();
         }
 
         protected virtual void OnDeactivateDerived() { }
@@ -124,18 +119,5 @@ namespace Kurisu.GOAP
         /// Transform target and conditions can SetUp at runtime
         /// </summary>
         protected virtual void SetupDerived() { }
-        protected void AddTemporaryState(string name, bool val)
-        {
-            worldState.SetState(name, val);
-            temporaryState[name] = val;
-        }
-        protected void ClearTemporaryStates()
-        {
-            foreach (var i in temporaryState)
-            {
-                worldState.RemoveState(i.Key);
-            }
-            ResetTemporaryState();
-        }
     }
 }

@@ -1,28 +1,29 @@
-using System;
 using System.Collections.Generic;
 namespace Kurisu.GOAP
 {
-    public readonly struct GOAPState : IEquatable<GOAPState>
+    public class GOAPState
     {
         /// <summary>
         /// Generated state unique key
         /// </summary>
         /// <value></value>
-        public readonly string UniqueID { get; }
-        public readonly string Key { get; }
-        public readonly bool Value { get; }
+        public string UniqueID { get; private set; }
+        public string Key { get; private set; }
+        public bool Value { get; private set; }
         private static readonly string On = "_on";
         private static readonly string Off = "_off";
-        public GOAPState(KeyValuePair<string, bool> pair)
+        private static readonly ObjectPool<GOAPState> pool = new(() => new());
+        public static GOAPState Get(KeyValuePair<string, bool> pair)
         {
-            Key = pair.Key;
-            Value = pair.Value;
-            UniqueID = $"{pair.Key}{(Value ? On : Off)}";
+            var state = pool.Get();
+            state.Key = pair.Key;
+            state.Value = pair.Value;
+            state.UniqueID = $"{pair.Key}{(pair.Value ? On : Off)}";
+            return state;
         }
-
-        public bool Equals(GOAPState other)
+        public void Pooled()
         {
-            return UniqueID == other.UniqueID;
+            pool.Push(this);
         }
     }
 }

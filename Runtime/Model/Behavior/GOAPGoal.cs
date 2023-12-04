@@ -25,7 +25,7 @@ namespace Kurisu.GOAP
             Preconditions = new Dictionary<string, bool>();
             this.worldState = worldState;
             SetupDerived();
-            ConditionStates = Conditions.Select(x => new GOAPState(x)).ToArray();
+            ConditionStates = Conditions.Select(x => GOAPState.Get(x)).ToArray();
         }
         /// <summary>
         /// Set the complete condition of this goal
