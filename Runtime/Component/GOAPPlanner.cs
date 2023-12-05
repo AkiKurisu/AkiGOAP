@@ -88,7 +88,8 @@ namespace Kurisu.GOAP
                                                 .ToList();
         public Object Object => gameObject;
         public Transform Transform => transform;
-        public event Action<IPlanner> OnPlanUpdate;
+        public event Action<IPlanner> OnUpdate;
+        public event Action<IPlanner> OnReload;
         [SerializeField, Tooltip("Control the log message of planner. Never: No log; OnlyActive: Only logging active plan message; IncludeSearch: Include " +
        "searching detail like action select information; IncludeFail: Include logging all fail message like fail to find path or fail to find a goal. " +
        "Always: Log all message")]
@@ -155,10 +156,12 @@ namespace Kurisu.GOAP
         public void InjectGoals(IEnumerable<IGoal> source)
         {
             backend.InjectGoals(source);
+            OnReload?.Invoke(this);
         }
         public void InjectActions(IEnumerable<IAction> source)
         {
             backend.InjectActions(source);
+            OnReload?.Invoke(this);
         }
 
         public void ManualActivate()
@@ -173,7 +176,7 @@ namespace Kurisu.GOAP
 
         public void NotifyUpdate()
         {
-            OnPlanUpdate?.Invoke(this);
+            OnUpdate?.Invoke(this);
         }
     }
 }

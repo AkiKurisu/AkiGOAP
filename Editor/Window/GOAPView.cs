@@ -91,7 +91,7 @@ namespace Kurisu.GOAP.Editor
                 planStack = new GOAPPlanStack(this);
                 planStack.SetPosition(new Rect(400, 300, 100, 100));
                 AddElement(planStack);
-                planner.OnPlanUpdate += UpdateView;
+                planner.OnUpdate += UpdateView;
                 goalStack.SetPosition(new Rect(-100, 300, 100, 100));
                 actionStack.SetPosition(new Rect(900, 300, 100, 100));
             }
@@ -143,7 +143,7 @@ namespace Kurisu.GOAP.Editor
             if (activeGoal is not GOAPGoal goapGoal) return;
             var t_Goal = goals.First(x => x.GUID == goapGoal.GUID);
             (t_Goal as GOAPGoalNode).SetUp(goapGoal, goapGoal.PreconditionsSatisfied(planner.WorldState), true);
-            planStack.InsertElement(0, t_Goal);
+            planStack.AddElement(t_Goal);
             foreach (var goal in goals)
             {
                 if (goal == t_Goal) continue;

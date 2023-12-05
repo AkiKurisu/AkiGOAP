@@ -65,10 +65,10 @@ namespace Kurisu.GOAP.Editor
         public SnapshotView(IPlanner planner)
         {
             this.planner = planner;
-            planner.OnPlanUpdate += CachePlan;
+            planner.OnUpdate += CachePlan;
             //Re-Register if editor window changed
-            RegisterCallback<AttachToPanelEvent>((evt) => { planner.OnPlanUpdate -= CachePlan; planner.OnPlanUpdate += CachePlan; });
-            RegisterCallback<DetachFromPanelEvent>((evt) => planner.OnPlanUpdate -= CachePlan);
+            RegisterCallback<AttachToPanelEvent>((evt) => { planner.OnUpdate -= CachePlan; planner.OnUpdate += CachePlan; });
+            RegisterCallback<DetachFromPanelEvent>((evt) => planner.OnUpdate -= CachePlan);
             Add(GetIMGUIContainer());
             SetupPanels();
             SetupActivePlanNodeParams();

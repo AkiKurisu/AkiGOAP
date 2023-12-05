@@ -36,6 +36,15 @@ namespace Kurisu.GOAP.Editor
             graphView.Restore();
             rootVisualElement.Add(CreateToolBar(graphView));
             rootVisualElement.Add(graphView);
+            if (set is IPlanner planner)
+            {
+                planner.OnReload += OnPlannerReload;
+            }
+        }
+        private void OnPlannerReload(IPlanner planner)
+        {
+            planner.OnReload -= OnPlannerReload;
+            Reload();
         }
         private VisualElement CreateToolBar(GOAPView graphView)
         {
@@ -65,6 +74,7 @@ namespace Kurisu.GOAP.Editor
                         else if (enableSnapshot && snapshotView == null)
                             rootVisualElement.Add(snapshotView = new SnapshotView(graphView.Set as IPlanner));
                     }
+                    GUI.enabled = !Application.isPlaying;
                     if (GUILayout.Button($"Save To Json", EditorStyles.toolbarButton))
                     {
                         string path = EditorUtility.SaveFilePanel("Select json file save path", Application.dataPath, graphView.Set.Object.name, "json");
@@ -81,6 +91,7 @@ namespace Kurisu.GOAP.Editor
                         }
                         GUIUtility.ExitGUI();
                     }
+                    GUI.enabled = true;
                     GUILayout.EndHorizontal();
                 }
             );

@@ -8,7 +8,8 @@ namespace Kurisu.GOAP
         void InjectActions(IEnumerable<IAction> source);
         IGoal ActivateGoal { get; }
         List<IAction> ActivatePlan { get; }
-        event Action<IPlanner> OnPlanUpdate;
+        event Action<IPlanner> OnUpdate;
+        event Action<IPlanner> OnReload;
         WorldState WorldState { get; }
         int ActiveActionIndex { get; }
         List<GoalData> GetSortedGoalData();
