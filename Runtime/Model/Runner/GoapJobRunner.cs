@@ -60,14 +60,17 @@ namespace Kurisu.GOAP.Runner
             foreach (var action in backend.Actions)
             {
                 var allMet = true;
-                foreach (var condition in action.ConditionStates)
+                if (action.ConditionStates != null)
                 {
-                    if (!backend.BackendHost.WorldState.InSet(condition.Key, condition.Value))
+                    foreach (var condition in action.ConditionStates)
                     {
-                        allMet = false;
-                        continue;
+                        if (!backend.BackendHost.WorldState.InSet(condition.Key, condition.Value))
+                        {
+                            allMet = false;
+                            continue;
+                        }
+                        conditionBuilder.SetConditionMet(condition, true);
                     }
-                    conditionBuilder.SetConditionMet(condition, true);
                 }
                 executableBuilder.SetExecutable(action, allMet);
                 costBuilder.SetCost(action, action.GetCost());

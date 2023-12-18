@@ -35,7 +35,17 @@ namespace Kurisu.GOAP
                 return _effects;
             }
         }
-        public GOAPState[] ConditionStates { get; private set; }
+        private GOAPState[] conditionStates;
+        public GOAPState[] ConditionStates
+        {
+            get
+            {
+#if UNITY_EDITOR
+                if (IsSelected) return null;
+#endif
+                return conditionStates;
+            }
+        }
         /// <summary>
         /// Whether effect of this action can be set dynamically at runtime
         /// </summary>
@@ -46,7 +56,7 @@ namespace Kurisu.GOAP
             SetupDerived();
             SetupEffects();
             if (!DynamicSetEffect) _effects = Effects.Select(x => GOAPState.Get(x)).ToArray();
-            ConditionStates = Preconditions.Select(x => GOAPState.Get(x)).ToArray();
+            conditionStates = Preconditions.Select(x => GOAPState.Get(x)).ToArray();
         }
 
 
@@ -116,7 +126,7 @@ namespace Kurisu.GOAP
         public bool PreconditionsSatisfied(WorldState worldState)
         {
 #if UNITY_EDITOR
-            //Get priority in editor, can be jumped to highest in graph editor
+            //Always satisfied when being selected
             if (IsSelected) return true;
 #endif
             return worldState.IsSubset(Preconditions);

@@ -31,11 +31,21 @@ namespace Kurisu.GOAP.Editor
             costLabel.text = $"Cost : {action.GetCost()}";
             StringBuilder stringBuilder = new();
             stringBuilder.AppendLine("<b>Conditions</b>:");
-            foreach (var state in action.ConditionStates)
+            if (Action.IsSelected)
             {
-                stringBuilder.Append(state.Key);
-                stringBuilder.Append(":");
-                stringBuilder.AppendLine(state.Value.ToString());
+                stringBuilder.AppendLine("Always Satisfied");
+            }
+            else
+            {
+                if (action.ConditionStates != null)
+                {
+                    foreach (var state in action.ConditionStates)
+                    {
+                        stringBuilder.Append(state.Key);
+                        stringBuilder.Append(":");
+                        stringBuilder.AppendLine(state.Value.ToString());
+                    }
+                }
             }
             stringBuilder.AppendLine("\n<b>Effects</b>:");
             //Do not use `EffectStates` for preventing dynamic effects trigger
