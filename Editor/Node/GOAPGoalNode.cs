@@ -43,6 +43,11 @@ namespace Kurisu.GOAP.Editor
             titleContainer.Add(priorityLabel);
             mainContainer.Add(stateLabel);
         }
+        protected override void OnRestore()
+        {
+            if (Goal.IsBanned)
+                AddToClassList("AlwaysBanned");
+        }
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
         {
             base.BuildContextualMenu(evt);

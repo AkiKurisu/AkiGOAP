@@ -51,7 +51,10 @@ namespace Kurisu.GOAP.Editor
             resolvers.ForEach(e => e.Restore(NodeBehavior));
             description.value = NodeBehavior.description;
             GUID = string.IsNullOrEmpty(behavior.GUID) ? Guid.NewGuid().ToString() : behavior.GUID;
+            OnRestore();
+
         }
+        protected virtual void OnRestore() { }
         private GOAPBehavior ReplaceBehavior()
         {
             NodeBehavior = Activator.CreateInstance(GetBehavior()) as GOAPBehavior;

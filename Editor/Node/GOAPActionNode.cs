@@ -60,6 +60,11 @@ namespace Kurisu.GOAP.Editor
             titleContainer.Add(costLabel);
             mainContainer.Add(stateLabel);
         }
+        protected override void OnRestore()
+        {
+            if (Action.IsSelected)
+                AddToClassList("AlwaysSatisfied");
+        }
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
         {
             base.BuildContextualMenu(evt);
