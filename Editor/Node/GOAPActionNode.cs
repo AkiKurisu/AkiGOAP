@@ -19,6 +19,7 @@ namespace Kurisu.GOAP.Editor
         }
         private readonly Label costLabel;
         private readonly Label stateLabel;
+        public GOAPAction Action => NodeBehavior as GOAPAction;
         protected sealed override void OnCleanUp()
         {
             costLabel.RemoveFromHierarchy();
@@ -48,6 +49,25 @@ namespace Kurisu.GOAP.Editor
             stateLabel.text = stringBuilder.ToString();
             titleContainer.Add(costLabel);
             mainContainer.Add(stateLabel);
+        }
+        public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
+        {
+            base.BuildContextualMenu(evt);
+            if (Application.isPlaying && Graph.Set is IPlanner planner)
+            {
+                if (Action.IsSelected)
+                    evt.menu.MenuItems().Add(new NodeMenuAction("Disable Always Satisfied", (a) =>
+                    {
+                        Action.IsSelected = false;
+                        RemoveFromClassList("AlwaysSatisfied");
+                    }, x => DropdownMenuAction.Status.Normal));
+                else
+                    evt.menu.MenuItems().Add(new NodeMenuAction("Enable Always Satisfied", (a) =>
+                    {
+                        Action.IsSelected = true;
+                        AddToClassList("AlwaysSatisfied");
+                    }, x => DropdownMenuAction.Status.Normal));
+            }
         }
     }
 }

@@ -3,6 +3,7 @@ using Kurisu.GOAP.Resolver;
 using Unity.Burst;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 namespace Kurisu.GOAP
 {
     /// <summary>
@@ -116,7 +117,6 @@ namespace Kurisu.GOAP
             }
             for (int i = 0; i < Goals.Count; i++)
             {
-
                 if (!Goals[i].PreconditionsSatisfied(WorldState))
                 {
                     if (LogFail) PlannerLog($"{Goals[i].Name} not valid as preconditions not satisfied");
@@ -213,8 +213,10 @@ namespace Kurisu.GOAP
         {
             ActivateAction?.OnDeactivate();
             ActivateGoal?.OnDeactivate();
+            bool needNotify = ActivateGoal != null;
             ActivateGoal = null;
             SetCurrentAction(null);
+            if (needNotify) NotifyHostUpdate();
         }
         private void SetCurrentAction(IAction action)
         {

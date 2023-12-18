@@ -73,6 +73,7 @@ namespace Kurisu.GOAP.Editor
             {
                 return e switch
                 {
+                    NodeMenuAction n => true,
                     DropdownMenuAction a => a.name == "Create Node" || a.name == "Delete",
                     _ => false,
                 };
@@ -124,9 +125,9 @@ namespace Kurisu.GOAP.Editor
         {
             planStack.Query<GOAPActionNode>().ForEach(x => actionStack.AddElement(x));
             planStack.Query<GOAPGoalNode>().ForEach(x => goalStack.AddElement(x));
-            var actions = actionStack.Query<GOAPNode>().ToList();
+            var actions = actionStack.Query<GOAPActionNode>().ToList();
             actions.ForEach(x => x.CleanUp());
-            var goals = goalStack.Query<GOAPNode>().ToList();
+            var goals = goalStack.Query<GOAPGoalNode>().ToList();
             goals.ForEach(x => x.CleanUp());
             var activePlans = planner.ActivatePlan;
             var activeGoal = planner.ActivateGoal;
@@ -136,19 +137,19 @@ namespace Kurisu.GOAP.Editor
                 {
                     if (action is not GOAPAction goapAction) continue;
                     var t_Action = actions.First(x => x.GUID == goapAction.GUID);
-                    (t_Action as GOAPActionNode).SetUp(goapAction);
+                    t_Action.SetUp(goapAction);
                     planStack.AddElement(t_Action);
                 }
             }
             if (activeGoal is not GOAPGoal goapGoal) return;
             var t_Goal = goals.First(x => x.GUID == goapGoal.GUID);
-            (t_Goal as GOAPGoalNode).SetUp(goapGoal, goapGoal.PreconditionsSatisfied(planner.WorldState), true);
+            t_Goal.SetUp(goapGoal, goapGoal.PreconditionsSatisfied(planner.WorldState), true);
             planStack.AddElement(t_Goal);
             foreach (var goal in goals)
             {
                 if (goal == t_Goal) continue;
                 var goalBehavior = planner.Behaviors.First(x => x.GUID == goal.GUID) as GOAPGoal;
-                (goal as GOAPGoalNode).SetUp(goalBehavior, goalBehavior.PreconditionsSatisfied(planner.WorldState), false);
+                goal.SetUp(goalBehavior, goalBehavior.PreconditionsSatisfied(planner.WorldState), false);
             }
         }
         internal void Save()
@@ -172,6 +173,21 @@ namespace Kurisu.GOAP.Editor
             }
             EditorUtility.SetDirty(set.Object);
             AssetDatabase.SaveAssets();
+        }
+        public void HeaveGoal(GOAPGoalNode targetGoalNode)
+        {
+            var goals = goalStack.Query<GOAPGoalNode>().ToList();
+            foreach (var goal in goals)
+            {
+                if (goal == targetGoalNode)
+                {
+                    goal.Goal.IsSelected = true;
+                }
+                else
+                {
+                    goal.Goal.IsSelected = false;
+                }
+            }
         }
     }
 }

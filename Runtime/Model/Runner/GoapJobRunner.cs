@@ -29,11 +29,6 @@ namespace Kurisu.GOAP.Runner
         public void Run()
         {
             resolveHandles.Clear();
-            RunInternal(backend);
-        }
-
-        private void RunInternal(JobSystemBackend backend)
-        {
             if (backend == null)
                 return;
             if (backend.CandidateGoals.Count == 0)
@@ -43,6 +38,7 @@ namespace Kurisu.GOAP.Runner
             FillBuilders(backend, backend.BackendHost.Transform);
             //Create job for each candidate goal
             foreach (var goal in backend.CandidateGoals)
+            {
                 resolveHandles.Add(new JobRunHandle(goal, resolver.StartResolve(new RunData
                 {
                     StartIndex = resolver.GetIndex(goal),
@@ -52,6 +48,7 @@ namespace Kurisu.GOAP.Runner
                     ConditionsMet = new NativeArray<bool>(conditionBuilder.Build(), Allocator.TempJob),
                     DistanceMultiplier = 1f
                 })));
+            }
         }
 
         private void FillBuilders(JobSystemBackend backend, Transform transform)

@@ -8,11 +8,9 @@ namespace Kurisu.GOAP.Example
         private int minAmount = 0;
         protected sealed override void SetupDerived()
         {
-            //Set this precondition to let goal automatically cancel
-            Preconditions["HaveEnergy"] = false;
             Conditions["HaveEnergy"] = true;
         }
-        public sealed override float GetPriority()
+        protected sealed override float SetupPriority()
         {
             return 0.5f;
         }

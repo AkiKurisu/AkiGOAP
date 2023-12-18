@@ -138,11 +138,13 @@ namespace Kurisu.GOAP
 
         private void OnCompleteOrFailActivePlan()
         {
+            bool needNotify = ActivateGoal != null;
             ActivatePlan?[ActiveActionIndex].OnDeactivate();
             ActivateGoal?.OnDeactivate();
             ActivateGoal = null;
             poolQueue.Push(ActivatePlan);
             activePlan = null;
+            if (needNotify) NotifyHostUpdate();
         }
 
         /// <summary>

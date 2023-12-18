@@ -19,6 +19,7 @@ namespace Kurisu.GOAP.Editor
         }
         private readonly Label priorityLabel;
         private readonly Label stateLabel;
+        public GOAPGoal Goal => NodeBehavior as GOAPGoal;
         protected sealed override void OnCleanUp()
         {
             priorityLabel.RemoveFromHierarchy();
@@ -27,7 +28,8 @@ namespace Kurisu.GOAP.Editor
         public void SetUp(GOAPGoal goal, bool canRun, bool isCurrent)
         {
             if (canRun) SetStyle(isCurrent);
-            priorityLabel.text = $"Priority : {goal.GetPriority()}";
+            if (goal.IsSelected) priorityLabel.text = $"Priority : Highest";
+            else priorityLabel.text = $"Priority : {goal.GetPriority()}";
             StringBuilder stringBuilder = new();
             stringBuilder.AppendLine("<b>Conditions</b>:");
             foreach (var state in goal.ConditionStates)
@@ -40,6 +42,35 @@ namespace Kurisu.GOAP.Editor
             stateLabel.text = stringBuilder.ToString();
             titleContainer.Add(priorityLabel);
             mainContainer.Add(stateLabel);
+        }
+        public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
+        {
+            base.BuildContextualMenu(evt);
+            if (Application.isPlaying && Graph.Set is IPlanner planner)
+            {
+                if (Goal.IsSelected)
+                    evt.menu.MenuItems().Add(new NodeMenuAction("Dropping this Goal", (a) =>
+                    {
+                        Graph.HeaveGoal(null);
+                    }, x => DropdownMenuAction.Status.Normal));
+                else
+                    evt.menu.MenuItems().Add(new NodeMenuAction("Heaving this Goal", (a) =>
+                    {
+                        Graph.HeaveGoal(this);
+                    }, x => Goal.PreconditionsSatisfied(planner.WorldState) ? DropdownMenuAction.Status.Normal : DropdownMenuAction.Status.Disabled));
+                if (Goal.IsBanned)
+                    evt.menu.MenuItems().Add(new NodeMenuAction("Disable Always Banned", (a) =>
+                    {
+                        Goal.IsBanned = false;
+                        RemoveFromClassList("AlwaysBanned");
+                    }, x => DropdownMenuAction.Status.Normal));
+                else
+                    evt.menu.MenuItems().Add(new NodeMenuAction("Enable Always Banned", (a) =>
+                    {
+                        Goal.IsBanned = true;
+                        AddToClassList("AlwaysBanned");
+                    }, x => DropdownMenuAction.Status.Normal));
+            }
         }
     }
 }

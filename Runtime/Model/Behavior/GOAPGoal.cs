@@ -31,13 +31,35 @@ namespace Kurisu.GOAP
         /// Set the complete condition of this goal
         /// </summary>
         protected virtual void SetupDerived() { }
-        public virtual float GetPriority()
+#if UNITY_EDITOR
+        internal bool IsSelected { get; set; }
+        internal bool IsBanned { get; set; }
+#endif
+        public float GetPriority()
+        {
+#if UNITY_EDITOR
+            //Get priority in editor, can be jumped to highest in graph editor
+            if (IsSelected) return float.MaxValue;
+#endif
+            return SetupPriority();
+        }
+        /// <summary>
+        /// Set static or dynamic priority of this goal
+        /// </summary>
+        /// <returns></returns>
+        protected virtual float SetupPriority()
         {
             return 0f;
         }
 
         public virtual bool PreconditionsSatisfied(WorldState worldState)
         {
+#if UNITY_EDITOR
+            if (IsBanned)
+            {
+                return false;
+            }
+#endif
             // Will return true if preconditions are empty
             return worldState.IsSubset(Preconditions);
         }

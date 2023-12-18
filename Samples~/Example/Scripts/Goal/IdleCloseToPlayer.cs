@@ -12,7 +12,7 @@ namespace Kurisu.GOAP.Example
         {
             Conditions["Idle"] = true;
         }
-        public sealed override float GetPriority()
+        protected sealed override float SetupPriority()
         {
             return 1f;
         }

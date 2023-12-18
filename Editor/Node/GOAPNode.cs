@@ -14,10 +14,10 @@ namespace Kurisu.GOAP.Editor
         private Type dirtyNodeBehaviorType;
         private readonly VisualElement container;
         private readonly TextField description;
-        public string Description => description.value;
         private readonly FieldResolverFactory fieldResolverFactory;
         public readonly List<IFieldResolver> resolvers = new();
         public Action<GOAPNode> onSelectAction;
+        protected GOAPView Graph { get; private set; }
         public sealed override void OnSelected()
         {
             base.OnSelected();
@@ -45,12 +45,12 @@ namespace Kurisu.GOAP.Editor
             description.RegisterCallback<FocusOutEvent>(evt => { Input.imeCompositionMode = IMECompositionMode.Auto; });
             mainContainer.Add(description);
         }
-        public void Restore(GOAPBehavior action)
+        public void Restore(GOAPBehavior behavior)
         {
-            NodeBehavior = action;
+            NodeBehavior = behavior;
             resolvers.ForEach(e => e.Restore(NodeBehavior));
             description.value = NodeBehavior.description;
-            GUID = string.IsNullOrEmpty(action.GUID) ? Guid.NewGuid().ToString() : action.GUID;
+            GUID = string.IsNullOrEmpty(behavior.GUID) ? Guid.NewGuid().ToString() : behavior.GUID;
         }
         private GOAPBehavior ReplaceBehavior()
         {
@@ -94,6 +94,7 @@ namespace Kurisu.GOAP.Editor
                 });
             var label = nodeBehavior.GetCustomAttribute(typeof(GOAPLabelAttribute), false) as GOAPLabelAttribute;
             title = label?.Title ?? nodeBehavior.Name;
+            Graph = view;
             if (view.Set is IPlanner)
             {
                 capabilities &= ~Capabilities.Copiable;

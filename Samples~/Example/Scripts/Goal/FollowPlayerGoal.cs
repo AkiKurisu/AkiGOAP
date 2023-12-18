@@ -14,7 +14,7 @@ namespace Kurisu.GOAP.Example
             Preconditions["InDistance"] = false;
             Conditions["InDistance"] = true;
         }
-        public sealed override float GetPriority()
+        protected sealed override float SetupPriority()
         {
             return 1f;
         }
