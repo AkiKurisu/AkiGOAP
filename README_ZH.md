@@ -31,7 +31,11 @@ AkiGOAP is a Goal Oriented Action Planner unity plugin that supports visualizati
 
 ## 安装
 1. 在Unity PackageManager中输入Git URL下载 ```https://github.com/AkiKurisu/AkiGOAP.git```
-#
+
+## 如何调试
+1. 右键Goal设置禁用
+2. 右键Goal设置为最高优先级（仅作用于单个Goal）
+3. 右键Action设置始终满足预先条件（Preconditions）
 
 ## 如何使用
 

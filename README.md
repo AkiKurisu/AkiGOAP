@@ -29,7 +29,11 @@ AkiGOAP is a Goal Oriented Action Planner unity plugin that supports visualizati
 
 ## Set Up
 1. Using git URL to download package by Unity PackageManager ```https://github.com/AkiKurisu/AkiGOAP.git```
-#
+
+## How to debug
+1. Right-click Goal and set Always Banned
+2. Right-click Goal and set it to the highest priority (only affects a single Goal)
+3. Right-click Action settings to always meet preconditions (Preconditions)
 
 ## How To Use
 
