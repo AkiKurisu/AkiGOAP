@@ -82,10 +82,10 @@ namespace Kurisu.GOAP
         public List<IAction> ActivatePlan => backend.ActivatePlan;
         public WorldState WorldState { get; private set; }
         public int ActiveActionIndex => backend.ActiveActionIndex;
-        public List<GOAPBehavior> Behaviors => Enumerable.Empty<GOAPBehavior>()
+        public List<GOAPBehavior> Behaviors => backend != null ? Enumerable.Empty<GOAPBehavior>()
                                                 .Concat(backend.Actions.OfType<GOAPBehavior>())
                                                 .Concat(backend.Goals.OfType<GOAPBehavior>())
-                                                .ToList();
+                                                .ToList() : new();
         public Object Object => gameObject;
         public Transform Transform => transform;
         public event Action<IPlanner> OnUpdate;

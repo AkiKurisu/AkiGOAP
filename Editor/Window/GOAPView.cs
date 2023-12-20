@@ -82,7 +82,7 @@ namespace Kurisu.GOAP.Editor
             evt.menu.MenuItems().Clear();
             remainTargets.ForEach(evt.menu.MenuItems().Add);
         }
-        internal void Restore()
+        public void Restore()
         {
             goalStack = new GOAPGoalStack(this);
             actionStack = new GOAPActionStack(this);
@@ -152,7 +152,7 @@ namespace Kurisu.GOAP.Editor
                 goal.SetUp(goalBehavior, goalBehavior.PreconditionsSatisfied(planner.WorldState), false);
             }
         }
-        internal void Save()
+        public void Save()
         {
             if (Application.isPlaying) return;
             set.Behaviors.Clear();

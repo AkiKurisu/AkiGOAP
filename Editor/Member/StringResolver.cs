@@ -6,13 +6,10 @@ namespace Kurisu.GOAP.Editor
 {
     public class StringResolver : FieldResolver<TextField, string>
     {
-        private readonly bool multiline;
-        public StringResolver(FieldInfo fieldInfo) : base(fieldInfo)
-        {
-            multiline = fieldInfo.GetCustomAttribute<MultilineAttribute>() != null;
-        }
+        public StringResolver(FieldInfo fieldInfo) : base(fieldInfo) { }
         protected override TextField CreateEditorField(FieldInfo fieldInfo)
         {
+            bool multiline = fieldInfo.GetCustomAttribute<MultilineAttribute>() != null;
             var field = new TextField(fieldInfo.Name);
             field.style.minWidth = 200;
             if (multiline)

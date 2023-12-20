@@ -25,17 +25,17 @@ namespace Kurisu.GOAP.Editor
             GOAPEditorWindow.ShowEditorWindow(target as IGOAPSet);
         }
     }
-    [CustomEditor(typeof(GOAPActionSet))]
+    [CustomEditor(typeof(GOAPActionSet), true)]
     public class GOAPActionSetEditor : SetEditor
     {
         protected override string LabelText => "AkiGOAP <size=12>V1.1.1</size> ActionSet";
     }
-    [CustomEditor(typeof(GOAPGoalSet))]
+    [CustomEditor(typeof(GOAPGoalSet), true)]
     public class GOAPGoalSetEditor : SetEditor
     {
         protected override string LabelText => "AkiGOAP <size=12>V1.1.1</size> GoalSet";
     }
-    [CustomEditor(typeof(GOAPSet))]
+    [CustomEditor(typeof(GOAPSet), true)]
     public class GOAPSetEditor : SetEditor
     {
         protected override string LabelText => "AkiGOAP <size=12>V1.1.1</size> GOAPSet";
