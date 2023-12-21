@@ -50,7 +50,13 @@ namespace Kurisu.GOAP.Runner
                 })));
             }
         }
-
+        /// <summary>
+        /// Current executableBuilder only works for current action's conditionStates 
+        /// Not consider the Effects brought about by path traversal which can only be set in job execution
+        /// MainBackend use StateCache <see cref="StateCache"/> to fix this problem
+        /// </summary>
+        /// <param name="backend"></param>
+        /// <param name="transform"></param>
         private void FillBuilders(JobSystemBackend backend, Transform transform)
         {
             executableBuilder.Clear();
@@ -72,6 +78,7 @@ namespace Kurisu.GOAP.Runner
                         conditionBuilder.SetConditionMet(condition, true);
                     }
                 }
+                //TODO: Fix SetExecutable
                 executableBuilder.SetExecutable(action, allMet);
                 costBuilder.SetCost(action, action.GetCost());
                 Transform target = backend.BackendHost.WorldState.ResolveNodeTarget(action);

@@ -11,12 +11,12 @@ namespace Kurisu.GOAP.Editor
     {
         private const string LabelText = "AkiGOAP <size=12>V1.1.1</size> Planner";
         private const string GraphButtonText = "Open GOAP Editor";
-        private const string IsActiveTooltip = "Whether current planner is active, will be disbled automatically" +
+        private const string IsActiveTooltip = "Whether current planner is active, will be disabled automatically" +
         " when skipSearchWhenActionRunning is on";
-        private const string SkilSearchTooltip = "Enabled to skip search plan when already have an action, enable this will need you to set correct precondition" +
+        private const string SkipSearchTooltip = "Enabled to skip search plan when already have an action, enable this will need you to set correct precondition" +
         " for each action to let it quit by itself";
         private const string BackendTooltip = "Select planner path execution backend, " +
-        "recommand using Normal Backend for simple job and using JobSystem Backend for including distance caculation and complex job";
+        "recommend using Normal Backend for simple job and using JobSystem Backend for complex job";
         private VisualElement backendView;
         public override VisualElement CreateInspectorGUI()
         {
@@ -76,7 +76,7 @@ namespace Kurisu.GOAP.Editor
             var skipSearchProperty = serializedObject.FindProperty("skipSearchWhenActionRunning");
             var skipSearchToggle = new Toggle("Skip Search When Action Running")
             {
-                tooltip = SkilSearchTooltip
+                tooltip = SkipSearchTooltip
             };
             skipSearchToggle.BindProperty(skipSearchProperty);
             skipSearchToggle.AddTo(myInspector);

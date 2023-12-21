@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using UnityEngine;
 namespace Kurisu.GOAP
 {
     /// <summary>
@@ -340,8 +341,8 @@ namespace Kurisu.GOAP
             //Remove effects from cache which means requirement is fulfilled by current node
             //The node connect in front of currentNode not need to meet this requirement anymore
             stateCache.DeleteIntersection(actionNode.action.Effects);
-            //Add currentNode preconditions which means there should has one node connected
-            //in front of currentNode can fulfill this requirement
+            //Add currentNode preconditions which means there should has one node
+            //connected in front of currentNode can fulfill this requirement
             stateCache.TryJoin(actionNode.action.Preconditions);
         }
         /// <summary>
@@ -372,32 +373,21 @@ namespace Kurisu.GOAP
         /// <returns></returns>
         private ActionNode GetNextNode(StateCache stateCache, List<ActionNode> closedList, List<ActionNode> openList)
         {
-            float minCost = -1f;
-            ActionNode nextNode = null;
-            ActionNode currentNode;
-            for (int i = closedList.Count - 1; i < closedList.Count; i++)
-            {
-                var cache = StateCache.Copy(stateCache);
-                AppendState(cache, closedList[i]);
-                currentNode = GetNextNode(
-                    cache.ToDictionary(),
-                    openList,
-                    out float nodeCost
-                );
-                cache.Pooled();
-                if ((minCost < 0 || nodeCost < minCost) && currentNode != null)
-                {
-                    nextNode = currentNode;
-                    minCost = nodeCost;
-                }
-            }
+            var cache = StateCache.Copy(stateCache);
+            AppendState(cache, closedList[^1]);
+            ActionNode nextNode = GetNextNode(
+                 cache.ToDictionary(),
+                 openList,
+                 out float nodeCost
+             );
+            cache.Pooled();
             if (nextNode != null)
             {
-                if (LogSearch) PlannerLog($"Selected {nextNode.action.Name} linked to {nextNode.parent.action.Name}", bold: true);
+                if (LogSearch) PlannerLog($"Selected {nextNode.action.Name} linked to {nextNode.parent.action.Name} with cost {nodeCost}", bold: true);
             }
             else
             {
-                if (LogFail) PlannerLog("Could not find next action");
+                if (LogFail) PlannerLog($"Could not find next valid action linked to {closedList[^1].action.Name}");
             }
             return nextNode;
         }
@@ -423,7 +413,7 @@ namespace Kurisu.GOAP
                     if (LogFail) PlannerLog($"{openList[i].action.Name} does not satisfy conditions {JsonConvert.SerializeObject(requiredState)}");
                     continue;
                 }
-                float cost = openList[i].action.GetCost();
+                float cost = openList[i].action.GetCost() + GetDistance(openList[i].action);
                 if (minCost < 0 || cost < minCost)
                 {
                     nextNode = openList[i];
@@ -432,6 +422,12 @@ namespace Kurisu.GOAP
             }
             nodeCost = minCost;
             return nextNode;
+        }
+        private float GetDistance(IAction action)
+        {
+            Transform target = BackendHost.WorldState.ResolveNodeTarget(action);
+            if (target == null) return 0f;
+            return Vector3.Distance(target.position, BackendHost.Transform.position);
         }
         /// <summary>
         /// Searches availableNodes for all those that satisfy node.preconditions 

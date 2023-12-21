@@ -1,5 +1,7 @@
 # AkiGOAP
 
+***Read this document in Chinese: [中文文档](./README_ZH.md)***
+
 AkiGOAP is a Goal Oriented Action Planner unity plugin that supports visualization, modular editing, and multi-threading, which integrates the functions of multiple open source GOAP plugins.
 
 ## Features
@@ -37,7 +39,7 @@ AkiGOAP is a Goal Oriented Action Planner unity plugin that supports visualizati
 
 ## How To Use
 
-Since the design of GOAP AI requires a certain threshold, I only introduce how to use the core functions of the plugin. For the specific design, please refer to the Example sample provided by the plugin.
+***Recommended to play the Samples/Example scene first***
 1. In the Asset folder, right-click the menu ```Create/AkiGOAP/GOAPSet``` to create a GOAPSet
 2. Click ```Open GOAP Editor``` to open the editor
 3. Right-click to create a Goal node or Action node, and drag the two nodes into ```GOAP Goal Stack``` and ```Action Stack``` respectively
@@ -89,25 +91,68 @@ Since the design of GOAP AI requires a certain threshold, I only introduce how t
 ## Backend Explanation
 There are differences in the implementation of the two algorithms
 
-1. Main Backend, all run on the main thread, suitable for tasks with low complexity, and can reduce overhead through reasonable design of Action. The algorithm is optimized from https://github.com/toastisme/OpenGOAP
+1. Main Backend, all run on the main thread, suitable for all types of tasks, Position can be added to Cost calculation, algorithm optimization and improvement from https://github.com/toastisme/OpenGOAP
 
-2. JobSystem Backend, the algorithm uses https://github.com/crashkonijn/GOAP. The created Job can also add Position to Cost calculation. The usage example is as follows:
-    ```C#
-    using UnityEngine;
-    namespace Kurisu.GOAP.Example
+2. JobSystem Backend, the algorithm uses https://github.com/crashkonijn/GOAP. The created Job can also add Position to Cost calculation, but there are certain restrictions on applicable tasks. For details, see [JobSystemBackend Limitations](#jobsystembackend-limitations)
+```C#
+using UnityEngine;
+namespace Kurisu.GOAP.Example
+{
+    public class GoToHome : ExampleAction
     {
-        public class GoToHome : ExampleAction
+        protected override void SetupDerived()
         {
-            protected override void SetupDerived()
-            {
-                //Register Transform bound to this node
-                worldState.RegisterNodeTarget(this,agent.Home);
-            }
+            //Register Transform bound to this node
+            worldState.RegisterNodeTarget(this,agent.Home);
         }
     }
-    ```
-    Features: Add all Goals and Actions to the search graph, and create a Job for each Goal to search for paths. Feed search results based on priority.
+}
+```
 
-3. Regarding ```TickType``` of GOAPPlanner, since GOAP is relatively expensive to use, we can consider turning off the search of Plan when it is not needed. Check ```ManualUpdateGoal``` to change the Goal update to manual call. Check ```ManualActivatePlanner```, the Planner will no longer automatically search for the plan, you need to manually call ```ManualActivate()``` to activate, and the planner will be closed again when it loses the plan for the first time after activation. This option is suitable for some turn-based games. Usually, the AI of these games only needs to search for a plan in a specific round or a specific time period.
+## How to optimize performance
+
+### Adjust GOAPPlanner ```TickType```
+
+Since GOAP is relatively expensive to use, we can consider turning off Plan search when it is not needed. Check ```ManualUpdateGoal``` to change Goal updates to manual calls. If ```ManualActivatePlanner``` is checked, the Planner will no longer automatically search for Plan and needs to be manually activated by calling ```ManualActivate()```, and the Planner will close again when it loses the Plan for the first time after activation. This option is suitable for some turn-based games. Usually the AI of these games only needs to search for plans in a specific round or a specific time period.
+### ``Skip Search When Action Running`` using `JobSystem Backend`
    
-4. Regarding the ```Skip Search When Action Running``` of `JobSystem Backend`, since planner will obtain the Plan (that is, the Action sequence) of all Goal cases in each frame by default. A typical example is: Goal A needs an item, but gets the item It is necessary to perform the movement behavior B first and then the collection behavior C. After finding that the current Action is B, the AI will perform B. If we want AI to perform acquisition behavior C after B is completed, we should notify Planner to search again or search every frame after B is completed. If this option is checked, Planner will no longer search when it has an Action. You need to let the Action close itself actively, for example, make the Action in a state where the Precondition is not satisfied.
+Since Planner will obtain the Plan (i.e. Action sequence) for all Goals in each frame by default, a typical example is: Goal A needs an item, and to obtain the item, you need to first perform movement behavior B and then perform collection behavior C. After searching that the current Action is B, the AI will perform B behavior. If we want the AI to collect behavior C after B is completed, we should notify the Planner to search again after B is completed or search every frame. If you check this option, Planner will no longer search when it owns an Action. You need to let the Action actively close itself, for example, put the Action in a state where the Precondition is not satisfied.
+
+## JobSystemBackend Limitations
+
+Assume a scenario
+
+Goal is to make an apple pie (HasApplePie:√)
+
+The Conditions and Effects of available Actions are as follows:
+
+1. Walk to the apple tree and pick apples
+
+     <b>Effects:</b> HasApple:√
+
+2. Go to the kitchen
+
+     <b>Effects:</b> InKitchen:√
+
+3. Make apple pie
+
+     <b>Conditions:</b> InKitchen:√ , HasApple:√
+
+     <b>Effects:</b> HasApplePie:√
+
+The current status is
+
+- HasApple:×, HasApplePie:×, InKitchen:×
+
+
+The theoretical plan is: walk to the [Walk to the apple tree and pick apples] => [Go to the kitchen] => [Make apple pie]
+
+However, the Plan given by the algorithm of `JobSystemBackend` is [Go to the kitchen] => [Make apple pie], which obviously cannot satisfy the Goal.
+
+### Why is there this problem
+
+The algorithm of `JobSystemBackend` stores whether all Actions can be entered (``IsExecutable``) in advance before path search, and does not consider the impact caused by the superposition of Conditions during path search, such as the Conditions in path "[Go to the kitchen] => [Make apple pie]" are actually "InKitchen:√ , HasApple:√" instead of the Conditions of [Go to the kitchen], so the wrong path was found.
+
+### How to fix
+
+Use `MainBackend` or add Conditions. For example, change the Conditions of [Go to the kitchen] to "HasApple:√"

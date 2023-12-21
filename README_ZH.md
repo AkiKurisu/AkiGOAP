@@ -1,5 +1,7 @@
 # AkiGOAP
 
+***Read this document in English: [English Document](./README.md)***
+
 AkiGOAP是一个支持可视化、模块化编辑，支持多线程的Goal Oriented Action Planner（目标导向的行为规划）Unity插件，同时集成了多个开源GOAP插件的功能。
 
 AkiGOAP is a Goal Oriented Action Planner unity plugin that supports visualization, modular editing, and multi-threading, which integrates the functions of multiple open source GOAP plugins.
@@ -39,7 +41,7 @@ AkiGOAP is a Goal Oriented Action Planner unity plugin that supports visualizati
 
 ## 如何使用
 
-由于GOAP AI的设计需要一定门槛，我只介绍如何使用插件的核心功能，具体的设计可以参考插件提供的Example样例。
+***推荐先游玩Samples/Example场景***
 
 1. 在Asset文件夹内右键菜单```Create/AkiGOAP/GOAPSet```创建GOAPSet
 2. 点击```Open GOAP Editor```打开编辑器
@@ -93,23 +95,70 @@ AkiGOAP is a Goal Oriented Action Planner unity plugin that supports visualizati
 
 两种算法实现上有所差异
 
-1. Main Backend，全部运行在主线程上，适用于复杂度较低的任务，可以通过Action的合理设计减少开销，算法优化自 https://github.com/toastisme/OpenGOAP 
+1. Main Backend，全部运行在主线程上，适用于全部类型的任务，可以将Position加入Cost计算，算法优化和改进自 https://github.com/toastisme/OpenGOAP 
 
-2. JobSystem Backend，算法使用 https://github.com/crashkonijn/GOAP ，创建的Job可以同时将Position加入Cost计算，使用样例如下：
-    ```C#
-    using UnityEngine;
-    namespace Kurisu.GOAP.Example
+2. JobSystem Backend，算法使用 https://github.com/crashkonijn/GOAP ，创建的Job可以同时将Position加入Cost计算，但适用的任务有一定限制，详见[JobSystemBackend限制](#jobsystembackend限制)
+   
+### Position计算样例如下：
+```C#
+using UnityEngine;
+namespace Kurisu.GOAP.Example
+{
+    public class GoToHome : ExampleAction
     {
-        public class GoToHome : ExampleAction
+        protected override void SetupDerived()
         {
-            protected override void SetupDerived()
-            {
-                //注册该结点所绑定的Transform
-                worldState.RegisterNodeTarget(this,agent.Home);
-            }
+            //注册该结点所绑定的Transform
+            worldState.RegisterNodeTarget(this,agent.Home);
         }
     }
-    ```
+}
+```
 
-3. 关于GOAPPlanner的```TickType```，由于GOAP使用比较费，我们可以考虑在不需要它的时候关闭Plan的搜索。勾选```ManualUpdateGoal```则Goal的更新都变更为手动调用。勾选```ManualActivatePlanner```则Planner不再自动搜索Plan，需要手动调用```ManualActivate()```激活，并且Planner在激活后第一次失去Plan时再次关闭。该选项适用于一些回合制游戏，通常这些游戏的AI仅需在特定回合或特定时间段进行Plan的搜索。
-4. 关于使用`JobSystem Backend`的```Skip Search When Action Running```, 由于Planner默认会在每帧获取全部Goal情况下的Plan（即Action序列）, 典型例子为：目标A需要一个物品，而获得物品需要先进行移动行为B再进行采集行为C。搜索到当前的Action为B后，AI将进行B行为。如果要让AI在B完成后进行采集行为C，我们应当在B完成后通知Planner重新搜索或者每帧进行搜索。如果勾选该选项，Planner就会在拥有Action时不再搜索，你需要让Action主动关闭自己，例如使该Action处于Precondition不满足的状态。
+## 如何优化性能
+
+### 调整GOAPPlanner的```TickType```
+
+由于GOAP使用比较费，我们可以考虑在不需要它的时候关闭Plan的搜索。勾选```ManualUpdateGoal```则Goal的更新都变更为手动调用。勾选```ManualActivatePlanner```则Planner不再自动搜索Plan，需要手动调用```ManualActivate()```激活，并且Planner在激活后第一次失去Plan时再次关闭。该选项适用于一些回合制游戏，通常这些游戏的AI仅需在特定回合或特定时间段进行Plan的搜索。
+### 使用`JobSystem Backend`的```Skip Search When Action Running```
+   
+由于Planner默认会在每帧获取全部Goal情况下的Plan（即Action序列）, 典型例子为：目标A需要一个物品，而获得物品需要先进行移动行为B再进行采集行为C。搜索到当前的Action为B后，AI将进行B行为。如果要让AI在B完成后进行采集行为C，我们应当在B完成后通知Planner重新搜索或者每帧进行搜索。如果勾选该选项，Planner就会在拥有Action时不再搜索，你需要让Action主动关闭自己，例如使该Action处于Precondition不满足的状态。
+
+## JobSystemBackend限制
+
+假设一个场景
+
+Goal为制作一个苹果派（HasApplePie:√）
+
+可用Actions的Conditions和Effects如下：
+
+1. 走到苹果树采苹果
+
+    <b>Effects:</b> HasApple:√
+
+2. 走到厨房
+
+    <b>Effects:</b> InKitchen:√
+
+3. 制作苹果派
+
+    <b>Conditions:</b> InKitchen:√ , HasApple:√
+
+    <b>Effects:</b> HasApplePie:√
+
+当前状态为
+
+- HasApple:×, HasApplePie:×, InKitchen:×
+
+
+理论上的Plan为：走到【苹果树采苹果】=>【走到厨房】=>【制作苹果派】
+
+但`JobSystemBackend`的算法给出的Plan为【走到厨房】=>【制作苹果派】，显然是无法满足Goal的。
+
+### 为什么会有这个问题
+
+`JobSystemBackend`的算法将所有Action是否可以进入(``IsExecutable``)在路径搜索前提前存储，没有考虑路径搜索时Conditions的叠加导致的影响，例如路径“【走到厨房】=>【制作苹果派】”中Conditions实际为“InKitchen:√ , HasApple:√”而非【走到厨房】的Conditions，因此找到了错误的路径。
+
+### 如何修复
+
+使用`MainBackend`或增加Conditions例如【走到厨房】的Conditions修改为“HasApple:√”
