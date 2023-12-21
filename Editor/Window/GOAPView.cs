@@ -120,6 +120,7 @@ namespace Kurisu.GOAP.Editor
                 else goalStack.AddElement(node);
                 node.onSelectAction = onSelectAction;
             }
+            if (Application.isPlaying) UpdateView(set as IPlanner);
         }
         private void UpdateView(IPlanner planner)
         {
@@ -131,7 +132,7 @@ namespace Kurisu.GOAP.Editor
             goals.ForEach(x => x.CleanUp());
             var activePlans = planner.ActivatePlan;
             var activeGoal = planner.ActivateGoal;
-            if (activePlans.Count != 0)
+            if (activePlans != null && activePlans.Count != 0)
             {
                 foreach (var action in activePlans)
                 {

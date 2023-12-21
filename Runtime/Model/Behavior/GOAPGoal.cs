@@ -18,7 +18,6 @@ namespace Kurisu.GOAP
         public Dictionary<string, bool> Preconditions { get; protected set; }
         GOAPState[] INode.EffectStates => null;
         public GOAPState[] ConditionStates { get; private set; }
-        public virtual string Name => GetType().Name;
         void IGoal.Init(WorldState worldState)
         {
             Conditions = new Dictionary<string, bool>();

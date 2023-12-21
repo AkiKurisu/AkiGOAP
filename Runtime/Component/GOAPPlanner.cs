@@ -109,6 +109,7 @@ namespace Kurisu.GOAP
         LogType IBackendHost.LogType => logType;
         TickType IBackendHost.TickType => tickType;
         #endregion
+        public IBackend Backend => backend;
         private void Awake()
         {
             WorldState = GetComponent<WorldState>();

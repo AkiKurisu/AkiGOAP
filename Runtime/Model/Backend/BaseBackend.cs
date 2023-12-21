@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace Kurisu.GOAP
 {
-    public abstract class BaseBackend : IDisposable
+    public abstract class BaseBackend : IDisposable, IBackend
     {
         protected const int Capacity = 10;
         #region  Host Status

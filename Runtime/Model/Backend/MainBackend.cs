@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Newtonsoft.Json;
 namespace Kurisu.GOAP
 {
     /// <summary>
@@ -40,6 +41,11 @@ namespace Kurisu.GOAP
                 StartCurrentBestGoal();
                 NotifyHostUpdate();
             }
+            else if (HaveNextAction())
+            {
+                StartCurrentBestAction();
+                NotifyHostUpdate();
+            }
             else
             {
                 if (TickType.HasFlag(TickType.ManualActivatePlanner))
@@ -58,6 +64,11 @@ namespace Kurisu.GOAP
         {
             return optimalGoal != null && optimalGoal != ActivateGoal;
         }
+        private bool HaveNextAction()
+        {
+            if (optimalPlan == null) return false;
+            return optimalPlan[0] != ActivatePlan[ActiveActionIndex];
+        }
         private List<IAction> GetPlan()
         {
             var pool = poolQueue.Get();
@@ -71,7 +82,6 @@ namespace Kurisu.GOAP
             {
                 ActivatePlan[ActiveActionIndex].OnDeactivate();
             }
-
             activeActionIndex = 0;
             ActivateGoal = optimalGoal;
             if (ActivatePlan != null) poolQueue.Push(ActivatePlan);
@@ -81,9 +91,21 @@ namespace Kurisu.GOAP
             if (LogActive) ActivePlanLog($"Starting {ActivatePlan[ActiveActionIndex].Name}");
             ActivatePlan[ActiveActionIndex].OnActivate();
         }
+        private void StartCurrentBestAction()
+        {
+            if (ActivatePlan != null && ActiveActionIndex < ActivatePlan.Count)
+            {
+                ActivatePlan[ActiveActionIndex].OnDeactivate();
+            }
+            activeActionIndex = 0;
+            ActivateGoal = optimalGoal;
+            if (ActivatePlan != null) poolQueue.Push(ActivatePlan);
+            activePlan = optimalPlan;
+            if (LogActive) ActivePlanLog($"Starting {ActivatePlan[ActiveActionIndex].Name}");
+            ActivatePlan[ActiveActionIndex].OnActivate();
+        }
         private void OnTickActivePlan()
         {
-
             // Nothing to run
             if (ActivateGoal == null || ActivatePlan == null) return;
 
@@ -117,25 +139,7 @@ namespace Kurisu.GOAP
                 OnCompleteOrFailActivePlan();
                 return;
             }
-
-            if (ActiveActionIndex < ActivatePlan.Count - 1)
-            {
-                // At least one more action after activeAction
-                for (int i = ActivatePlan.Count - 1; i > ActiveActionIndex; i--)
-                {
-                    if (ActivatePlan[i].PreconditionsSatisfied(WorldState))
-                    {
-                        // Can skip to a new action
-                        if (LogActive) ActivePlanLog($"Stopping {ActivatePlan[ActiveActionIndex].Name}");
-                        ActivatePlan[ActiveActionIndex].OnDeactivate();
-                        activeActionIndex = i;
-                        if (LogActive) ActivePlanLog($"Moving to new action: {ActivatePlan[ActiveActionIndex].Name}");
-                        ActivatePlan[ActiveActionIndex].OnActivate();
-                    }
-                }
-            }
         }
-
         private void OnCompleteOrFailActivePlan()
         {
             bool needNotify = ActivateGoal != null;
@@ -305,7 +309,7 @@ namespace Kurisu.GOAP
                 AppendState(copy, currentNode);
                 //The one found with the smallest cost and that meets the conditions of the previous node is added to CloseList
                 closedList.Add(currentNode);
-                openList.Remove(currentNode);
+                openList.Clear();
                 //If currentNode can satisfy state cache (which is managed backward through finding) then return the path
                 if (WorldState.IsSubset(copy.ToDictionary()))
                 {
@@ -371,18 +375,8 @@ namespace Kurisu.GOAP
             float minCost = -1f;
             ActionNode nextNode = null;
             ActionNode currentNode;
-            for (int i = 0; i < closedList.Count; i++)
+            for (int i = closedList.Count - 1; i < closedList.Count; i++)
             {
-                //There are some possible results
-                //Goal needs precondition: [a:1,b:1,c:0]
-                //Path 1:
-                //Node A meet [a:1], also requires [b:1]
-                //So requirement now becomes [b:1,c:0]
-                //Path 2:
-                //Node A meet [a:1], but requires [c:1\
-                //So requirement now becomes [b:1,c:0,c:1], which is not possible
-                //So it means we meet a collision
-                //Only if Node A fulfill c:0 can it add new requirement
                 var cache = StateCache.Copy(stateCache);
                 AppendState(cache, closedList[i]);
                 currentNode = GetNextNode(
@@ -399,7 +393,7 @@ namespace Kurisu.GOAP
             }
             if (nextNode != null)
             {
-                if (LogSearch) PlannerLog($"Selected {nextNode.action.Name}", bold: true);
+                if (LogSearch) PlannerLog($"Selected {nextNode.action.Name} linked to {nextNode.parent.action.Name}", bold: true);
             }
             else
             {
@@ -426,7 +420,7 @@ namespace Kurisu.GOAP
             {
                 if (!openList[i].action.SatisfiesConditions(requiredState))
                 {
-                    if (LogFail) PlannerLog($"{openList[i].action.Name} does not satisfy conditions");
+                    if (LogFail) PlannerLog($"{openList[i].action.Name} does not satisfy conditions {JsonConvert.SerializeObject(requiredState)}");
                     continue;
                 }
                 float cost = openList[i].action.GetCost();

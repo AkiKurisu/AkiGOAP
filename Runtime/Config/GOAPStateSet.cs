@@ -54,6 +54,10 @@ namespace Kurisu.GOAP
         {
             return StateCache.Get(states);
         }
+        public IReadOnlyDictionary<string, bool> GetStates()
+        {
+            return states;
+        }
 #if UNITY_EDITOR
         /// <summary>
         /// In editor, we use OnValidate to init dictionary.

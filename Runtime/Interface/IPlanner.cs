@@ -15,5 +15,6 @@ namespace Kurisu.GOAP
         List<GoalData> GetSortedGoalData();
         void TickGoals();
         void ManualActivate();
+        IBackend Backend { get; }
     }
 }

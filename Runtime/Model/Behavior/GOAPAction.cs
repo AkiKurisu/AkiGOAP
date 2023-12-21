@@ -13,7 +13,6 @@ namespace Kurisu.GOAP
         public Dictionary<string, bool> Preconditions { get; protected set; } = new Dictionary<string, bool>();
         // What will be in worldState when action completed
         public Dictionary<string, bool> Effects { get; protected set; } = new Dictionary<string, bool>();
-        public virtual string Name => GetType().Name;
         private GOAPState[] _effects;
         public GOAPState[] EffectStates
         {
@@ -90,6 +89,16 @@ namespace Kurisu.GOAP
             }
             if (satisfyCounter == 0) return false;
             //Should check the precondition will not create status collision
+            //There are some possible results
+            //Goal needs precondition: [a:1,b:1,c:0]
+            //Result 1:
+            //Node A meet [a:1], also requires [b:1]
+            //So requirement now becomes [b:1,c:0]
+            //Result 2:
+            //Node A meet [a:1], but requires [c:1]
+            //So requirement now becomes [b:1,c:0,c:1], which is not possible
+            //So it means we meet a collision
+            //Only if Node A fulfill c:0 can it add new requirement
             foreach (var preCondition in Preconditions)
             {
                 if (conditions.TryGetValue(preCondition.Key, out bool value) && preCondition.Value != value)

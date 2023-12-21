@@ -5,6 +5,7 @@ namespace Kurisu.GOAP
     [Serializable]
     public class GOAPBehavior
     {
+        public virtual string Name => GetType().Name;
 #if UNITY_EDITOR
         [HideInInspector]
         internal string description = string.Empty;
