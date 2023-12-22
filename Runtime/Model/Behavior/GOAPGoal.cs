@@ -13,15 +13,13 @@ namespace Kurisu.GOAP
     {
         protected WorldState worldState;
         // What must be in worldState for the goal to be complete
-        public Dictionary<string, bool> Conditions { get; protected set; }
+        public Dictionary<string, bool> Conditions { get; protected set; } = new Dictionary<string, bool>();
         // What must be in worldState for the goal to be considered
-        public Dictionary<string, bool> Preconditions { get; protected set; }
+        public Dictionary<string, bool> Preconditions { get; protected set; } = new Dictionary<string, bool>();
         GOAPState[] INode.EffectStates => null;
         public GOAPState[] ConditionStates { get; private set; }
         void IGoal.Init(WorldState worldState)
         {
-            Conditions = new Dictionary<string, bool>();
-            Preconditions = new Dictionary<string, bool>();
             this.worldState = worldState;
             SetupDerived();
             ConditionStates = Conditions.Select(x => GOAPState.Get(x)).ToArray();
