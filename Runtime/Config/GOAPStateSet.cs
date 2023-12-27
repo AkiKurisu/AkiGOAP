@@ -50,7 +50,7 @@ namespace Kurisu.GOAP
             }
             return true;
         }
-        internal StateCache GetCache()
+        public StateCache GetCache()
         {
             return StateCache.Get(states);
         }

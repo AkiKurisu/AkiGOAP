@@ -4,7 +4,7 @@ namespace Kurisu.GOAP
     /// <summary>
     /// State cache for path-finding
     /// </summary>
-    internal class StateCache
+    public class StateCache
     {
         private bool isPooled;
         private static readonly ObjectPool<StateCache> pool = new(() => new(), 5);

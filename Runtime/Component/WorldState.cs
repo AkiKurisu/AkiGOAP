@@ -24,6 +24,10 @@ namespace Kurisu.GOAP
         private GOAPStateSet globalState;
         public GOAPStateSet GlobalState => globalState;
         private readonly Dictionary<INode, Transform> nodeTargets = new();
+        /// <summary>
+        /// On world state changed
+        /// </summary>
+        public event Action<string, bool> OnStateUpdate;
 #if UNITY_EDITOR
         //Editor hook for UIElement update
         internal Action OnUpdate;
@@ -83,6 +87,7 @@ namespace Kurisu.GOAP
 #if UNITY_EDITOR
             NotifyEditor();
 #endif
+            OnStateUpdate?.Invoke(name, value);
         }
 
         public void RemoveState(string name, bool includeGlobal = true)
