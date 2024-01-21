@@ -3,7 +3,7 @@ namespace Kurisu.GOAP
 {
     public interface IBackend
     {
-        public List<IAction> Actions { get; }
-        public List<IGoal> Goals { get; }
+        List<IAction> Actions { get; }
+        List<IGoal> Goals { get; }
     }
 }

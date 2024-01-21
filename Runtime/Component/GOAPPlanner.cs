@@ -179,5 +179,9 @@ namespace Kurisu.GOAP
         {
             OnUpdate?.Invoke(this);
         }
+        public void AbortActivePlan()
+        {
+            backend.AbortActivePlan();
+        }
     }
 }

@@ -454,5 +454,11 @@ namespace Kurisu.GOAP
             }
             return linkNodesCache;
         }
+        public override void AbortActivePlan()
+        {
+            ActivatePlan?[ActiveActionIndex].OnDeactivate();
+            poolQueue.Push(ActivatePlan);
+            activePlan = null;
+        }
     }
 }

@@ -3,7 +3,6 @@ using Kurisu.GOAP.Resolver;
 using Unity.Burst;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 namespace Kurisu.GOAP
 {
     /// <summary>
@@ -224,6 +223,12 @@ namespace Kurisu.GOAP
             activateAction = action;
             if (activateAction != null)
                 ActivatePlan.AddRange(candidatePlan);
+        }
+        public override void AbortActivePlan()
+        {
+            ActivateAction?.OnDeactivate();
+            ActivatePlan.Clear();
+            activateAction = null;
         }
         public override void Dispose()
         {
