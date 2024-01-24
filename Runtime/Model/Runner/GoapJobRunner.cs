@@ -15,6 +15,7 @@ namespace Kurisu.GOAP.Runner
         private readonly ICostBuilder costBuilder;
         private readonly IConditionBuilder conditionBuilder;
         private List<IAction> resultCache = new();
+        private bool isRunning;
         public GOAPJobRunner(JobSystemBackend backend, IGraphResolver graphResolver)
         {
             this.backend = backend;
@@ -33,8 +34,9 @@ namespace Kurisu.GOAP.Runner
                 return;
             if (backend.CandidateGoals.Count == 0)
                 return;
-            if (backend.ActivateAction != null && backend.BackendHost.SkipSearchWhenActionRunning)
+            if (backend.ActivateAction != null && backend.BackendHost.SearchMode >= SearchMode.OnActionComplete)
                 return;
+            isRunning = true;
             FillBuilders(backend, backend.BackendHost.Transform);
             //Create job for each candidate goal
             foreach (var goal in backend.CandidateGoals)
@@ -88,6 +90,8 @@ namespace Kurisu.GOAP.Runner
         }
         public void Complete()
         {
+            if (!isRunning) return;
+            isRunning = false;
             bool find = false;
             foreach (var resolveHandle in resolveHandles)
             {
@@ -120,7 +124,6 @@ namespace Kurisu.GOAP.Runner
             {
                 resolveHandle.Handle.CompleteNonAlloc(ref resultCache);
             }
-
             resolver.Dispose();
         }
 

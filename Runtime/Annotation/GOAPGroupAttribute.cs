@@ -7,11 +7,11 @@ namespace Kurisu.GOAP
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     public sealed class GOAPGroupAttribute : Attribute
     {
-        public string Group=>mGroup;
-		private readonly string mGroup;
+        public string Group => mGroup;
+        private readonly string mGroup;
         public GOAPGroupAttribute(string group)
         {
-            this.mGroup=group;
+            mGroup = group;
         }
     }
 }

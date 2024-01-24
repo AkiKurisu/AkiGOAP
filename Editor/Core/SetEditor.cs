@@ -10,14 +10,14 @@ namespace Kurisu.GOAP.Editor
         public override VisualElement CreateInspectorGUI()
         {
             var myInspector = new VisualElement();
-            myInspector.styleSheets.Add(UIUtility.GetInspectorStyleSheet());
-            myInspector.Add(UIUtility.GetLabel(LabelText, 20));
+            myInspector.styleSheets.Add(UIElementUtility.GetInspectorStyleSheet());
+            myInspector.Add(UIElementUtility.GetLabel(LabelText, 20));
             var description = new TextField(string.Empty);
             description.BindProperty(serializedObject.FindProperty("Description"));
             description.multiline = true;
             myInspector.Add(description);
             //Draw Button
-            myInspector.Add(UIUtility.GetButton(ButtonText, UIUtility.AkiBlue, Open, 100));
+            myInspector.Add(UIElementUtility.GetButton(ButtonText, UIElementUtility.AkiBlue, Open, 100));
             return myInspector;
         }
         private void Open()

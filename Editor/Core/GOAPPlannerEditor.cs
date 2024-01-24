@@ -11,18 +11,13 @@ namespace Kurisu.GOAP.Editor
     {
         private const string LabelText = "AkiGOAP <size=12>V1.1.1</size> Planner";
         private const string GraphButtonText = "Open GOAP Editor";
-        private const string IsActiveTooltip = "Whether current planner is active, will be disabled automatically" +
-        " when skipSearchWhenActionRunning is on";
-        private const string SkipSearchTooltip = "Enabled to skip search plan when already have an action, enable this will need you to set correct precondition" +
-        " for each action to let it quit by itself";
         private const string BackendTooltip = "Select planner path execution backend, " +
         "recommend using Normal Backend for simple job and using JobSystem Backend for complex job";
-        private VisualElement backendView;
         public override VisualElement CreateInspectorGUI()
         {
             var myInspector = new VisualElement();
             //Title
-            myInspector.Add(UIUtility.GetLabel(LabelText, 20));
+            myInspector.Add(UIElementUtility.GetLabel(LabelText, 20));
             //Backend
             myInspector.AddSpace();
             var backendType = serializedObject.FindProperty("backendType");
@@ -43,54 +38,25 @@ namespace Kurisu.GOAP.Editor
             //Default
             InspectorElement.FillDefaultInspector(myInspector, serializedObject, this);
             myInspector.Remove(myInspector.Q<PropertyField>("PropertyField:m_Script"));
-            myInspector.Remove(myInspector.Q<PropertyField>("PropertyField:skipSearchWhenActionRunning"));
-            myInspector.Remove(myInspector.Q<PropertyField>("PropertyField:isActive"));
             myInspector.Remove(myInspector.Q<PropertyField>("PropertyField:backendType"));
             //Setting
-            UIUtility.GetLabel("Normal Setting", 14, color: UIUtility.AkiBlue, anchor: TextAnchor.MiddleLeft).AddTo(myInspector);
+            UIElementUtility.GetLabel("Normal Setting", 14, color: UIElementUtility.AkiBlue, anchor: TextAnchor.MiddleLeft).AddTo(myInspector);
             myInspector.Q<PropertyField>("PropertyField:logType").MoveToEnd(myInspector);
             myInspector.Q<PropertyField>("PropertyField:tickType").MoveToEnd(myInspector);
-            backendView = new VisualElement();
-            //Pro Setting
-            if ((PlannerBackend)backendType.enumValueIndex == PlannerBackend.JobSystem)
-            {
-                DrawJobSystemsBackend(backendView);
-            }
-            myInspector.Add(backendView);
-            //Editor Buttpm
-            UIUtility.GetButton(GraphButtonText, UIUtility.AkiBlue, ShowGOAPEditor, 100)
+            myInspector.AddSpace();
+            UIElementUtility.GetLabel("Advanced Setting", 14, color: UIElementUtility.AkiBlue, anchor: TextAnchor.MiddleLeft).AddTo(myInspector);
+            myInspector.Q<PropertyField>("PropertyField:isActive").MoveToEnd(myInspector);
+            myInspector.Q<PropertyField>("PropertyField:searchMode").MoveToEnd(myInspector);
+            //Editor Bottom
+            UIElementUtility.GetButton(GraphButtonText, UIElementUtility.AkiBlue, ShowGOAPEditor, 100)
                 .Enabled(Application.isPlaying)
                 .AddTo(myInspector);
             return myInspector;
-        }
-        private void DrawJobSystemsBackend(VisualElement myInspector)
-        {
-            var isActive = new Toggle("Is Active")
-            {
-                tooltip = IsActiveTooltip
-            };
-            isActive.BindProperty(serializedObject.FindProperty("isActive"));
-            isActive.AddTo(myInspector);
-            myInspector.AddSpace();
-            UIUtility.GetLabel("Pro Setting", 14, color: UIUtility.AkiBlue, anchor: TextAnchor.MiddleLeft).AddTo(myInspector);
-            var skipSearchProperty = serializedObject.FindProperty("skipSearchWhenActionRunning");
-            var skipSearchToggle = new Toggle("Skip Search When Action Running")
-            {
-                tooltip = SkipSearchTooltip
-            };
-            skipSearchToggle.BindProperty(skipSearchProperty);
-            skipSearchToggle.AddTo(myInspector);
         }
         private void OnBackendChanged(PlannerBackend newBackend)
         {
             serializedObject.FindProperty("backendType").enumValueIndex = (int)newBackend;
             serializedObject.ApplyModifiedProperties();
-            //Repaint Editor
-            backendView.Clear();
-            if (newBackend == PlannerBackend.JobSystem)
-            {
-                DrawJobSystemsBackend(backendView);
-            }
         }
         private void ShowGOAPEditor()
         {

@@ -3,6 +3,7 @@ using Kurisu.GOAP.Resolver;
 using Unity.Burst;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 namespace Kurisu.GOAP
 {
     /// <summary>
@@ -22,14 +23,20 @@ namespace Kurisu.GOAP
         private GOAPJobRunner jobRunner;
         private bool activateFlag = false;
         private bool isDirty = false;
-        private IAction candidateAction;
         private IGoal candidateGoal;
         private readonly List<IAction> candidatePlan = new(Capacity);
         private readonly List<IGoal> candidateGoals = new(Capacity);
         public List<IGoal> CandidateGoals => candidateGoals;
-        private IAction activateAction;
-        public IAction ActivateAction => activateAction;
-        public override int ActiveActionIndex => 0;
+        public IAction ActivateAction
+        {
+            get
+            {
+                if (activeActionIndex < ActivatePlan.Count) return ActivatePlan[activeActionIndex];
+                return null;
+            }
+        }
+        private int activeActionIndex = 0;
+        public override int ActiveActionIndex => activeActionIndex;
         public override List<IAction> ActivatePlan { get; } = new(Capacity);
         public JobSystemBackend(IBackendHost backendHost) : base(backendHost) { }
         public override void ManualActivate()
@@ -64,7 +71,7 @@ namespace Kurisu.GOAP
         }
         private void Tick()
         {
-            if (!TickType.HasFlag(TickType.ManualUpdateGoal)) TickGoals();
+            if (!TickType.HasFlag(TickType.ManualTickGoal)) TickGoals();
             OnTickActivePlan();
             GetHighestPriorityGoals(candidateGoals);
             jobRunner?.Run();
@@ -84,9 +91,9 @@ namespace Kurisu.GOAP
                 StartCurrentBestGoal();
                 notifyHost = true;
             }
-            else if (HaveNextAction())
+            else if (HaveBetterPlan())
             {
-                StartCurrentBestAction();
+                StartCurrentBestPlan();
                 notifyHost = true;
             }
             if (notifyHost)
@@ -131,34 +138,30 @@ namespace Kurisu.GOAP
             if (goal == null || path.Count == 0)
             {
                 candidatePlan.Clear();
-                candidateAction = null;
                 candidateGoal = null;
                 if (LogFail) PlannerLog("No candidate goal or path was found.");
                 return;
             }
-            var action = path[0];
             candidatePlan.Clear();
             candidatePlan.AddRange(path);
-            if (candidateAction != action && LogSearch) PlannerLog($"Set candidate action:{action.Name}");
-            candidateAction = action;
             if (candidateGoal != goal && LogSearch) PlannerLog($"Set candidate goal:{goal.Name}");
             candidateGoal = goal;
         }
 
         private void StartCurrentBestGoal()
         {
-            //Activate Goal
             ActivateGoal?.OnDeactivate();
             ActivateGoal = candidateGoal;
             if (LogActive) ActivePlanLog($"Starting new plan for {ActivateGoal.Name}", bold: true);
             ActivateGoal.OnActivate();
-            //Activate Action
-            StartCurrentBestAction();
+            StartCurrentBestPlan();
         }
-        private void StartCurrentBestAction()
+        private void StartCurrentBestPlan()
         {
             ActivateAction?.OnDeactivate();
-            SetCurrentAction(candidateAction);
+            activeActionIndex = 0;
+            ActivatePlan.Clear();
+            ActivatePlan.AddRange(candidatePlan);
             if (LogActive) ActivePlanLog($"Starting {ActivateAction.Name}");
             ActivateAction.OnActivate();
         }
@@ -184,8 +187,25 @@ namespace Kurisu.GOAP
                     $"{ActivateAction.Name} failed as preconditions are no longer satisfied",
                     bold: true
                     );
-                OnCompleteOrFailActivePlan();
-                return;
+                if (SearchMode != SearchMode.OnPlanComplete)
+                {
+                    OnCompleteOrFailActivePlan();
+                    return;
+                }
+                else
+                {
+                    //Use original plan cache to activate next
+                    //If search mode use OnActionComplete, it is not necessary
+                    if (TryActivateNext())
+                    {
+                        NotifyHostUpdate();
+                    }
+                    else
+                    {
+                        OnCompleteOrFailActivePlan();
+                        return;
+                    }
+                }
             }
             ActivateAction.OnTick();
             // Goal complete
@@ -196,13 +216,36 @@ namespace Kurisu.GOAP
                 return;
             }
         }
+        private bool TryActivateNext()
+        {
+            // At least one more action after activeAction
+            for (int i = activeActionIndex + 1; i < ActivatePlan.Count; ++i)
+            {
+                if (ActivatePlan[i].PreconditionsSatisfied(WorldState))
+                {
+                    // Can skip to a new action
+                    if (LogActive) ActivePlanLog($"Stopping {ActivatePlan[activeActionIndex]}");
+                    ActivatePlan[activeActionIndex].OnDeactivate();
+                    activeActionIndex = i;
+                    if (LogActive) ActivePlanLog($"Moving to new action: {ActivatePlan[activeActionIndex]}");
+                    ActivatePlan[activeActionIndex].OnActivate();
+                    return true;
+                }
+            }
+            return false;
+        }
         private bool CandidateGoalAvailable()
         {
-            return candidateAction != null && candidateGoal != null;
+            return candidatePlan.Count > 0 && candidateGoal != null;
         }
-        private bool HaveNextAction()
+        private bool HaveBetterPlan()
         {
-            return candidateAction != null && candidateAction != ActivateAction;
+            if (candidatePlan.Count != ActivatePlan.Count) return true;
+            for (int i = 0; i < candidatePlan.Count; ++i)
+            {
+                if (candidatePlan[i] != ActivatePlan[i]) return true;
+            }
+            return false;
         }
         private bool BetterGoalAvailable()
         {
@@ -214,21 +257,15 @@ namespace Kurisu.GOAP
             ActivateGoal?.OnDeactivate();
             bool needNotify = ActivateGoal != null;
             ActivateGoal = null;
-            SetCurrentAction(null);
-            if (needNotify) NotifyHostUpdate();
-        }
-        private void SetCurrentAction(IAction action)
-        {
             ActivatePlan.Clear();
-            activateAction = action;
-            if (activateAction != null)
-                ActivatePlan.AddRange(candidatePlan);
+            activeActionIndex = 0;
+            if (needNotify) NotifyHostUpdate();
         }
         public override void AbortActivePlan()
         {
             ActivateAction?.OnDeactivate();
             ActivatePlan.Clear();
-            activateAction = null;
+            activeActionIndex = 0;
         }
         public override void Dispose()
         {

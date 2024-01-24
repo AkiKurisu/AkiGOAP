@@ -34,17 +34,17 @@ namespace Kurisu.GOAP
         public override void Update()
         {
             if (!IsActive) return;
-            if (!TickType.HasFlag(TickType.ManualUpdateGoal)) TickGoals();
+            if (!TickType.HasFlag(TickType.ManualTickGoal)) TickGoals();
             OnTickActivePlan();
-            GetHighestPriorityGoal(chosenGoal: out optimalGoal, out optimalPlan);
+            SearchOptimalPlan();
             if ((NoActiveGoal() && GoalAvailable()) || BetterGoalAvailable())
             {
                 StartCurrentBestGoal();
                 NotifyHostUpdate();
             }
-            else if (HaveNextAction())
+            else if (HaveBetterPlan())
             {
-                StartCurrentBestAction();
+                StartCurrentBestPlan();
                 NotifyHostUpdate();
             }
             else
@@ -56,6 +56,15 @@ namespace Kurisu.GOAP
                 }
             }
         }
+        private void SearchOptimalPlan()
+        {
+            //Skip search if has plan
+            if (SearchMode >= SearchMode.OnActionComplete && ActivatePlan != null && ActiveActionIndex < ActivatePlan.Count)
+            {
+                return;
+            }
+            GetHighestPriorityGoal(chosenGoal: out optimalGoal, out optimalPlan);
+        }
         private bool GoalAvailable()
         {
             return optimalPlan != null && optimalGoal != null;
@@ -65,10 +74,15 @@ namespace Kurisu.GOAP
         {
             return optimalGoal != null && optimalGoal != ActivateGoal;
         }
-        private bool HaveNextAction()
+        private bool HaveBetterPlan()
         {
             if (optimalPlan == null) return false;
-            return optimalPlan[0] != ActivatePlan[ActiveActionIndex];
+            if (optimalPlan.Count != ActivatePlan.Count) return true;
+            for (int i = 0; i < optimalPlan.Count; ++i)
+            {
+                if (optimalPlan[i] != ActivatePlan[i]) return true;
+            }
+            return false;
         }
         private List<IAction> GetPlan()
         {
@@ -79,27 +93,18 @@ namespace Kurisu.GOAP
         private void StartCurrentBestGoal()
         {
             ActivateGoal?.OnDeactivate();
-            if (ActivatePlan != null && ActiveActionIndex < ActivatePlan.Count)
-            {
-                ActivatePlan[ActiveActionIndex].OnDeactivate();
-            }
-            activeActionIndex = 0;
             ActivateGoal = optimalGoal;
-            if (ActivatePlan != null) poolQueue.Push(ActivatePlan);
-            activePlan = optimalPlan;
             if (LogActive) ActivePlanLog($"Starting new plan for {ActivateGoal.Name}", bold: true);
             ActivateGoal.OnActivate();
-            if (LogActive) ActivePlanLog($"Starting {ActivatePlan[ActiveActionIndex].Name}");
-            ActivatePlan[ActiveActionIndex].OnActivate();
+            StartCurrentBestPlan();
         }
-        private void StartCurrentBestAction()
+        private void StartCurrentBestPlan()
         {
             if (ActivatePlan != null && ActiveActionIndex < ActivatePlan.Count)
             {
                 ActivatePlan[ActiveActionIndex].OnDeactivate();
             }
             activeActionIndex = 0;
-            ActivateGoal = optimalGoal;
             if (ActivatePlan != null) poolQueue.Push(ActivatePlan);
             activePlan = optimalPlan;
             if (LogActive) ActivePlanLog($"Starting {ActivatePlan[ActiveActionIndex].Name}");
@@ -128,8 +133,25 @@ namespace Kurisu.GOAP
                     $"{ActivatePlan[ActiveActionIndex].Name} failed as preconditions are no longer satisfied",
                     bold: true
                     );
-                OnCompleteOrFailActivePlan();
-                return;
+                if (SearchMode != SearchMode.OnPlanComplete)
+                {
+                    OnCompleteOrFailActivePlan();
+                    return;
+                }
+                else
+                {
+                    //Use original plan cache to activate next
+                    //If search mode use OnActionComplete, it is not necessary
+                    if (TryActivateNext())
+                    {
+                        NotifyHostUpdate();
+                    }
+                    else
+                    {
+                        OnCompleteOrFailActivePlan();
+                        return;
+                    }
+                }
             }
 
             ActivatePlan[ActiveActionIndex].OnTick();
@@ -140,6 +162,25 @@ namespace Kurisu.GOAP
                 OnCompleteOrFailActivePlan();
                 return;
             }
+
+        }
+        private bool TryActivateNext()
+        {
+            // At least one more action after activeAction
+            for (int i = activeActionIndex + 1; i < activePlan.Count; ++i)
+            {
+                if (activePlan[i].PreconditionsSatisfied(WorldState))
+                {
+                    // Can skip to a new action
+                    if (LogActive) ActivePlanLog($"Stopping {activePlan[activeActionIndex]}");
+                    activePlan[activeActionIndex].OnDeactivate();
+                    activeActionIndex = i;
+                    if (LogActive) ActivePlanLog($"Moving to new action: {activePlan[activeActionIndex]}");
+                    activePlan[activeActionIndex].OnActivate();
+                    return true;
+                }
+            }
+            return false;
         }
         private void OnCompleteOrFailActivePlan()
         {
