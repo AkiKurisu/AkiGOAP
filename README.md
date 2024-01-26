@@ -111,12 +111,29 @@ namespace Kurisu.GOAP.Example
 
 ## How to optimize performance
 
-### Adjust GOAPPlanner ```TickType```
+### Adjust ```TickType```
 
-Since GOAP is relatively expensive to use, we can consider turning off Plan search when it is not needed. Check ```ManualUpdateGoal``` to change Goal updates to manual calls. If ```ManualActivatePlanner``` is checked, the Planner will no longer automatically search for Plan and needs to be manually activated by calling ```ManualActivate()```, and the Planner will close again when it loses the Plan for the first time after activation. This option is suitable for some turn-based games. Usually the AI of these games only needs to search for plans in a specific round or a specific time period.
-### ``Skip Search When Action Running`` using `JobSystem Backend`
+Since GOAP is relatively expensive to use, we can consider turning off Plan search when it is not needed. 
+
+Check ```ManualUpdateGoal``` to change Goal updates to manual calls. If ```ManualActivatePlanner``` is checked, the Planner will no longer automatically search for Plan and needs to be manually activated by calling ```ManualActivate()```, and the Planner will close again when it loses the Plan for the first time after activation. This option is suitable for some turn-based games. Usually the AI of these games only needs to search for plans in a specific round or a specific time period.
+
+### Adjust ```SearchMode```
    
-Since Planner will obtain the Plan (i.e. Action sequence) for all Goals in each frame by default, a typical example is: Goal A needs an item, and to obtain the item, you need to first perform movement behavior B and then perform collection behavior C. After searching that the current Action is B, the AI will perform B behavior. If we want the AI to collect behavior C after B is completed, we should notify the Planner to search again after B is completed or search every frame. If you check this option, Planner will no longer search when it owns an Action. You need to let the Action actively close itself, for example, put the Action in a state where the Precondition is not satisfied.
+For example: Target A needs an item, and to obtain the item, you need to first perform <b>Move Action B</b> and then perform <b>Collect Action C</b>. After the Planner searches that the current Action is B, the AI will perform Action B.
+
+If we want the AI to collect behavior C after B is completed, we should notify the Planner to search again after B is completed or search every frame.
+
+The default `SearchMode` of the Planner in AkiGOAP is `Always`, which means it will search every frame. If the searched Plan does not match the current Plan, it will be replaced. You can adjust Planner's search timing by modifying `SearchMode`. If you use `OnActionComplete`, Planner will search again after Action completes or fails. If you use `OnPlanComplete`, Planner will search again after Plan completes or fails. Otherwise, it will It will be executed sequentially according to the current Plan after the Action completes or fails.
+
+
+* Performance comparison example of Example scene (taking `JobSystemBackend` as an example)
+    
+     `SearchMode` uses `Always`
+     <img src="Images/Optimize0.png" />
+
+     `SearchMode` uses `OnActionComplete` or `OnPlanComplete`
+
+     <img src="Images/Optimize1.png" />
 
 ## JobSystemBackend Limitations
 

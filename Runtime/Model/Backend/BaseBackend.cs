@@ -11,6 +11,7 @@ namespace Kurisu.GOAP
         protected WorldState WorldState => backendHost.WorldState;
         protected LogType LogType => backendHost.LogType;
         protected TickType TickType => backendHost.TickType;
+        protected SearchMode SearchMode => backendHost.SearchMode;
         #endregion
         public IGoal ActivateGoal { get; protected set; }
         public virtual int ActiveActionIndex { get; }

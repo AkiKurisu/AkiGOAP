@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 namespace Kurisu.GOAP.Editor
 {
-    internal class UIUtility
+    internal class UIElementUtility
     {
         internal static Button GetButton(string text, Color? color = null, System.Action callBack = null, float widthPercent = 50, float fontSize = 15)
         {

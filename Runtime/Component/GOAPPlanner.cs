@@ -57,8 +57,14 @@ namespace Kurisu.GOAP
     [Flags]
     public enum TickType
     {
-        ManualUpdateGoal = 2,
+        ManualTickGoal = 2,
         ManualActivatePlanner = 4
+    }
+    public enum SearchMode
+    {
+        Always,
+        OnActionComplete,
+        OnPlanComplete
     }
     public enum PlannerBackend
     {
@@ -73,6 +79,7 @@ namespace Kurisu.GOAP
         /// </summary>
         JobSystem
     }
+    [RequireComponent(typeof(WorldState))]
     public class GOAPPlanner : MonoBehaviour, IPlanner, IBackendHost
     {
         [SerializeField]
@@ -82,8 +89,7 @@ namespace Kurisu.GOAP
         public List<IAction> ActivatePlan => backend.ActivatePlan;
         public WorldState WorldState { get; private set; }
         public int ActiveActionIndex => backend.ActiveActionIndex;
-        public List<GOAPBehavior> Behaviors => backend != null ? Enumerable.Empty<GOAPBehavior>()
-                                                .Concat(backend.Actions.OfType<GOAPBehavior>())
+        public List<GOAPBehavior> Behaviors => backend != null ? backend.Actions.OfType<GOAPBehavior>()
                                                 .Concat(backend.Goals.OfType<GOAPBehavior>())
                                                 .ToList() : new();
         public Object Object => gameObject;
@@ -95,16 +101,18 @@ namespace Kurisu.GOAP
        "Always: Log all message")]
         private LogType logType;
         [SerializeField, Tooltip("Nothing: Automatically update planner.\n" +
-       "ManualUpdateGoal: Toggle this to disable planner to tick goal automatically.\n" +
-       "ManualActivatePlanner: Toggle this to disable planner to tick and search plan automatically," +
+       "ManualTickGoal: Set this to disable planner to tick goal automatically.\n" +
+       "ManualActivatePlanner: Set this to disable planner to tick and search plan automatically," +
        " however when the plan is generated, the planner will focus that plan until the plan is deactivated. So you can't stop plan manually.")]
         private TickType tickType;
-        [SerializeField]
-        private bool skipSearchWhenActionRunning;
-        [SerializeField]
+        [SerializeField, Tooltip("Always: Planner will always search plan. OnActionComplete: Planner will research plan when current action complete." +
+        " OnPlanComplete: Planner will search after whole plan complete.")]
+        private SearchMode searchMode;
+        [SerializeField, Tooltip("Whether current planner is active, will be disabled automatically" +
+        " when skipSearchWhenActionRunning is on")]
         private bool isActive = true;
         #region Host Status
-        bool IBackendHost.SkipSearchWhenActionRunning => skipSearchWhenActionRunning;
+        SearchMode IBackendHost.SearchMode => searchMode;
         bool IBackendHost.IsActive { get => isActive; set => isActive = value; }
         LogType IBackendHost.LogType => logType;
         TickType IBackendHost.TickType => tickType;

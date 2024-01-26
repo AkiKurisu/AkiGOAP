@@ -23,7 +23,7 @@ namespace Kurisu.GOAP.Editor
         {
             myInspector = new VisualElement();
             var state = target as WorldState;
-            myInspector.Add(UIUtility.GetLabel(LabelText, 20));
+            myInspector.Add(UIElementUtility.GetLabel(LabelText, 20));
             InspectorElement.FillDefaultInspector(myInspector, serializedObject, this);
             myInspector.Remove(myInspector.Q<PropertyField>("PropertyField:m_Script"));
             if (Application.isPlaying)
@@ -80,9 +80,9 @@ namespace Kurisu.GOAP.Editor
             foreach (var pair in states)
             {
                 var group = GetGroup();
-                group.Add(UIUtility.GetLabel(global ? Global : Local, 12, 33, UIUtility.AkiBlue));
-                group.Add(UIUtility.GetLabel(pair.Key, 12, 33));
-                group.Add(UIUtility.GetLabel(pair.Value ? True : False, 12, 33));
+                group.Add(UIElementUtility.GetLabel(global ? Global : Local, 12, 33, UIElementUtility.AkiBlue));
+                group.Add(UIElementUtility.GetLabel(pair.Key, 12, 33));
+                group.Add(UIElementUtility.GetLabel(pair.Value ? True : False, 12, 33));
                 statesGroup.Add(group);
             }
         }
