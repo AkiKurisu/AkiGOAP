@@ -117,12 +117,28 @@ namespace Kurisu.GOAP.Example
 
 ## 如何优化性能
 
-### 调整GOAPPlanner的```TickType```
+### 调整```TickType```
 
-由于GOAP使用比较费，我们可以考虑在不需要它的时候关闭Plan的搜索。勾选```ManualUpdateGoal```则Goal的更新都变更为手动调用。勾选```ManualActivatePlanner```则Planner不再自动搜索Plan，需要手动调用```ManualActivate()```激活，并且Planner在激活后第一次失去Plan时再次关闭。该选项适用于一些回合制游戏，通常这些游戏的AI仅需在特定回合或特定时间段进行Plan的搜索。
-### 使用`JobSystem Backend`的```Skip Search When Action Running```
+由于GOAP使用比较费性能，我们可以考虑手动启用Plan的搜索。
+
+勾选```ManualUpdateGoal```则Goal的更新都变更为手动调用。勾选```ManualActivatePlanner```则Planner不再自动搜索Plan，需要手动调用```ManualActivate()```激活，并且Planner在激活后第一次失去Plan时再次关闭。该选项适用于一些回合制游戏，通常这些游戏的AI仅需在特定回合或特定时间段进行Plan的搜索。
+### 调整```SearchMode```
    
-由于Planner默认会在每帧获取全部Goal情况下的Plan（即Action序列）, 典型例子为：目标A需要一个物品，而获得物品需要先进行移动行为B再进行采集行为C。搜索到当前的Action为B后，AI将进行B行为。如果要让AI在B完成后进行采集行为C，我们应当在B完成后通知Planner重新搜索或者每帧进行搜索。如果勾选该选项，Planner就会在拥有Action时不再搜索，你需要让Action主动关闭自己，例如使该Action处于Precondition不满足的状态。
+举例：目标A需要一个物品，而获得物品需要先进行<b>移动行为B</b>再进行<b>采集行为C</b>。Planner搜索到当前的Action为B后，AI将进行B行为。
+
+如果要让AI在B完成后进行采集行为C，我们应当在B完成后通知Planner重新搜索或者每帧进行搜索。
+
+AkiGOAP中Planner默认的`SearchMode`为`Always`即会在每帧进行搜索，如果搜索出的Plan与当前Plan不符则被替代。你可以通过修改`SearchMode`来调整Planner的搜索时机,如果使用`OnActionComplete`,Planner则在Action完成或失败后重新搜索，如果使用`OnPlanComplete`,Planner则在Plan完成或失败后重新搜索，否则就会在Action完成或失败后根据当前Plan依次执行。
+
+
+* Example场景的性能对比示例(以`JobSystemBackend`为例)
+    
+    `SearchMode`使用`Always`
+    <img src="Images/Optimize0.png" />
+
+    `SearchMode`使用`OnActionComplete`或`OnPlanComplete`
+
+    <img src="Images/Optimize1.png" />
 
 ## JobSystemBackend限制
 
