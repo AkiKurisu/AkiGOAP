@@ -9,7 +9,7 @@ namespace Kurisu.GOAP.Editor
     [CustomEditor(typeof(WorldState), true)]
     public class WorldStateEditor : UnityEditor.Editor
     {
-        private const string LabelText = "AkiGOAP <size=12>V1.1.1</size> WorldState";
+        private const string LabelText = "AkiGOAP WorldState";
         private const string WorldState = "Runtime States:";
         private const string True = "<color=#5BDB14>True</color>";
         private const string False = "<color=#ff2f2f>False</color>";

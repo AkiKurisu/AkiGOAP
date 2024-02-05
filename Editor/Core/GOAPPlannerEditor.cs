@@ -9,7 +9,7 @@ namespace Kurisu.GOAP.Editor
     [CustomEditor(typeof(GOAPPlanner), true)]
     public class GOAPPlannerEditor : UnityEditor.Editor
     {
-        private const string LabelText = "AkiGOAP <size=12>V1.1.1</size> Planner";
+        private const string LabelText = "AkiGOAP <size=12>V1.1.2</size> Planner";
         private const string GraphButtonText = "Open GOAP Editor";
         private const string BackendTooltip = "Select planner path execution backend, " +
         "recommend using Normal Backend for simple job and using JobSystem Backend for complex job";

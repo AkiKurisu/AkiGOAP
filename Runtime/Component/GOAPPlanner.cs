@@ -105,17 +105,17 @@ namespace Kurisu.GOAP
        "ManualActivatePlanner: Set this to disable planner to tick and search plan automatically," +
        " however when the plan is generated, the planner will focus that plan until the plan is deactivated. So you can't stop plan manually.")]
         private TickType tickType;
+        public TickType TickType { get => tickType; set => tickType = value; }
         [SerializeField, Tooltip("Always: Planner will always search plan. OnActionComplete: Planner will research plan when current action complete." +
         " OnPlanComplete: Planner will search after whole plan complete.")]
         private SearchMode searchMode;
+        public SearchMode SearchMode { get => searchMode; set => searchMode = value; }
         [SerializeField, Tooltip("Whether current planner is active, will be disabled automatically" +
         " when skipSearchWhenActionRunning is on")]
         private bool isActive = true;
         #region Host Status
-        SearchMode IBackendHost.SearchMode => searchMode;
         bool IBackendHost.IsActive { get => isActive; set => isActive = value; }
         LogType IBackendHost.LogType => logType;
-        TickType IBackendHost.TickType => tickType;
         #endregion
         public IBackend Backend => backend;
         private void Awake()

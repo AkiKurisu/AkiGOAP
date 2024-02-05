@@ -28,16 +28,16 @@ namespace Kurisu.GOAP.Editor
     [CustomEditor(typeof(GOAPActionSet), true)]
     public class GOAPActionSetEditor : SetEditor
     {
-        protected override string LabelText => "AkiGOAP <size=12>V1.1.1</size> ActionSet";
+        protected override string LabelText => "AkiGOAP ActionSet";
     }
     [CustomEditor(typeof(GOAPGoalSet), true)]
     public class GOAPGoalSetEditor : SetEditor
     {
-        protected override string LabelText => "AkiGOAP <size=12>V1.1.1</size> GoalSet";
+        protected override string LabelText => "AkiGOAP GoalSet";
     }
     [CustomEditor(typeof(GOAPSet), true)]
     public class GOAPSetEditor : SetEditor
     {
-        protected override string LabelText => "AkiGOAP <size=12>V1.1.1</size> GOAPSet";
+        protected override string LabelText => "AkiGOAP GOAPSet";
     }
 }
