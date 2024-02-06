@@ -92,5 +92,6 @@ namespace Kurisu.GOAP
 
         public virtual void Dispose() { }
         public abstract void AbortActivePlan();
+        public abstract void CleanUp();
     }
 }

@@ -162,17 +162,25 @@ namespace Kurisu.GOAP
             return goalData;
         }
 
-        public void InjectGoals(IEnumerable<IGoal> source)
+        public void SetGoals(IEnumerable<IGoal> source)
         {
+            backend.CleanUp();
             backend.InjectGoals(source);
             OnReload?.Invoke(this);
         }
-        public void InjectActions(IEnumerable<IAction> source)
+        public void SetActions(IEnumerable<IAction> source)
         {
+            backend.CleanUp();
             backend.InjectActions(source);
             OnReload?.Invoke(this);
         }
-
+        public void SetGoalsAndActions(IEnumerable<IGoal> goals, IEnumerable<IAction> actions)
+        {
+            backend.CleanUp();
+            backend.InjectGoals(goals);
+            backend.InjectActions(actions);
+            OnReload?.Invoke(this);
+        }
         public void ManualActivate()
         {
             backend.ManualActivate();
@@ -190,6 +198,10 @@ namespace Kurisu.GOAP
         public void AbortActivePlan()
         {
             backend.AbortActivePlan();
+        }
+        public void CleanUp()
+        {
+            backend.CleanUp();
         }
     }
 }

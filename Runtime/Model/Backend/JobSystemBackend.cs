@@ -3,7 +3,6 @@ using Kurisu.GOAP.Resolver;
 using Unity.Burst;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 namespace Kurisu.GOAP
 {
     /// <summary>
@@ -266,6 +265,16 @@ namespace Kurisu.GOAP
             ActivateAction?.OnDeactivate();
             ActivatePlan.Clear();
             activeActionIndex = 0;
+        }
+        public override void CleanUp()
+        {
+            ActivateAction?.OnDeactivate();
+            ActivatePlan.Clear();
+            activeActionIndex = 0;
+            ActivateGoal?.OnDeactivate();
+            ActivateGoal = null;
+            candidatePlan.Clear();
+            candidateGoal = null;
         }
         public override void Dispose()
         {

@@ -94,6 +94,7 @@ namespace Kurisu.GOAP
         {
             ActivateGoal?.OnDeactivate();
             ActivateGoal = optimalGoal;
+            optimalGoal = null;
             if (LogActive) ActivePlanLog($"Starting new plan for {ActivateGoal.Name}", bold: true);
             ActivateGoal.OnActivate();
             StartCurrentBestPlan();
@@ -107,6 +108,7 @@ namespace Kurisu.GOAP
             activeActionIndex = 0;
             if (ActivatePlan != null) poolQueue.Push(ActivatePlan);
             activePlan = optimalPlan;
+            optimalPlan = null;
             if (LogActive) ActivePlanLog($"Starting {ActivatePlan[ActiveActionIndex].Name}");
             ActivatePlan[ActiveActionIndex].OnActivate();
         }
@@ -500,6 +502,18 @@ namespace Kurisu.GOAP
             ActivatePlan?[ActiveActionIndex].OnDeactivate();
             poolQueue.Push(ActivatePlan);
             activePlan = null;
+        }
+        public override void CleanUp()
+        {
+            ActivatePlan?[ActiveActionIndex].OnDeactivate();
+            poolQueue.Push(ActivatePlan);
+            activePlan = null;
+            ActivateGoal?.OnDeactivate();
+            ActivateGoal = null;
+            optimalGoal = null;
+            if (optimalPlan != null)
+                poolQueue.Push(optimalPlan);
+            optimalPlan = null;
         }
     }
 }
