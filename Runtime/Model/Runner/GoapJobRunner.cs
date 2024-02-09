@@ -41,6 +41,7 @@ namespace Kurisu.GOAP.Runner
             //Create job for each candidate goal
             foreach (var goal in backend.CandidateGoals)
             {
+                positionBuilder.SetPosition(goal, backend.BackendHost.Transform.position);
                 resolveHandles.Add(new JobRunHandle(goal, resolver.StartResolve(new RunData
                 {
                     StartIndex = resolver.GetIndex(goal),

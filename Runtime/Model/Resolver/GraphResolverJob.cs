@@ -85,6 +85,7 @@ namespace Kurisu.GOAP.Resolver
                 openList.Sort(new NodeSorter());
 
                 var currentNode = openList[0];
+                bool isFirst = openList.Length == 1;
 
                 if (runData.IsExecutable[currentNode.Index])
                 {
@@ -123,7 +124,7 @@ namespace Kurisu.GOAP.Resolver
                             {
                                 Index = neighborIndex,
                                 G = newG,
-                                H = Heuristic(neighborIndex, currentNode.Index),
+                                H = Heuristic(neighborIndex, currentNode.Index, currentNode.Index == runData.StartIndex, isFirst),
                                 ParentIndex = currentNode.Index
                             };
                             openSet.Add(neighborIndex, neighbor);
@@ -149,11 +150,15 @@ namespace Kurisu.GOAP.Resolver
             closedSet.Dispose();
         }
         [BurstCompile]
-        private float Heuristic(int currentIndex, int previousIndex)
+        private float Heuristic(int currentIndex, int previousIndex, bool previousIsStart, bool isFirst)
         {
             var previousPosition = RunData.Positions[previousIndex];
             var currentPosition = RunData.Positions[currentIndex];
 
+            if (!isFirst && previousIsStart)
+            {
+                return 0f;
+            }
             if (previousPosition.Equals(InvalidPosition) || currentPosition.Equals(InvalidPosition))
             {
                 return 0f;
