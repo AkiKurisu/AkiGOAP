@@ -67,7 +67,7 @@ namespace Kurisu.GOAP
         {
             Init();
         }
-#else
+#endif
         /// <summary>
         /// Awake of ScriptableObject will be called when the file is unsearialized at first, useful in build game
         /// </summary>
@@ -75,6 +75,5 @@ namespace Kurisu.GOAP
         {
             Init();
         }
-#endif
     }
 }

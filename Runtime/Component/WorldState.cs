@@ -18,11 +18,10 @@ namespace Kurisu.GOAP
         private bool defaultFalse = true;
         /// <summary>
         /// Shared between objects.
-        /// All states assumed to have g_ prefix
         /// </summary>
         [SerializeField]
         private GOAPStateSet globalState;
-        public GOAPStateSet GlobalState => globalState;
+        public GOAPStateSet GlobalState { get => globalState; set => globalState = value; }
         private readonly Dictionary<INode, Transform> nodeTargets = new();
         /// <summary>
         /// On world state changed
