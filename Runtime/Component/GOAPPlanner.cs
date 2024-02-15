@@ -58,7 +58,8 @@ namespace Kurisu.GOAP
     public enum TickType
     {
         ManualTickGoal = 2,
-        ManualActivatePlanner = 4
+        ManualActivatePlanner = 4,
+        ManualTickPlan = 8
     }
     public enum SearchMode
     {
@@ -103,7 +104,9 @@ namespace Kurisu.GOAP
         [SerializeField, Tooltip("Nothing: Automatically update planner.\n" +
        "ManualTickGoal: Set this to disable planner to tick goal automatically.\n" +
        "ManualActivatePlanner: Set this to disable planner to tick and search plan automatically," +
-       " however when the plan is generated, the planner will focus that plan until the plan is deactivated. So you can't stop plan manually.")]
+       " however when the plan is generated, the planner will focus that plan until the plan is deactivated." +
+       " So you can't stop plan manually.\n" +
+       "ManualTickPlan: Set this to tick plan manually, planner will only provide plan without activating or running it.")]
         private TickType tickType;
         public TickType TickType { get => tickType; set => tickType = value; }
         [SerializeField, Tooltip("Always: Planner will always search plan. OnActionComplete: Planner will research plan when current action complete." +
