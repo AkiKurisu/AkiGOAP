@@ -15,13 +15,13 @@ namespace Kurisu.GOAP
         /// </summary>
         /// <param name="conditions"></param>
         /// <returns></returns>
-        bool SatisfiesConditions(Dictionary<string, bool> conditions);
+        bool SatisfiesConditions(IDictionary<string, bool> conditions);
         /// <summary>
         /// True if worldState is a superset of preconditions
         /// </summary>
         /// <param name="worldState"></param>
         /// <returns></returns>
-        bool PreconditionsSatisfied(WorldState worldState);
+        bool PreconditionsSatisfied(IStateCollection worldState);
         /// <summary>
         /// Called every frame by GOAPPlanner
         /// </summary>

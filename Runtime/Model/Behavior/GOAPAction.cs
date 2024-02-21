@@ -63,7 +63,7 @@ namespace Kurisu.GOAP
         {
             return 0f;
         }
-        public bool SatisfiesConditions(Dictionary<string, bool> conditions)
+        public bool SatisfiesConditions(IDictionary<string, bool> conditions)
         {
             if (DynamicSetEffect)
             {
@@ -132,7 +132,7 @@ namespace Kurisu.GOAP
         /// <value></value>
         internal bool IsSelected { get; set; }
 #endif
-        public bool PreconditionsSatisfied(WorldState worldState)
+        public bool PreconditionsSatisfied(IStateCollection worldState)
         {
 #if UNITY_EDITOR
             //Always satisfied when being selected

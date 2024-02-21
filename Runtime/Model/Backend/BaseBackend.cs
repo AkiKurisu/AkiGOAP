@@ -16,6 +16,7 @@ namespace Kurisu.GOAP
         public IGoal ActivateGoal { get; protected set; }
         public virtual int ActiveActionIndex { get; }
         public virtual List<IAction> ActivatePlan { get; }
+        protected bool CanTickPlan => !TickType.HasFlag(TickType.ManualTickPlan);
         #region  Log
         protected bool LogActive => LogType.HasFlag(LogType.OnlyActive);
         protected bool LogSearch => LogType.HasFlag(LogType.IncludeSearch);

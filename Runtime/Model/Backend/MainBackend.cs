@@ -101,7 +101,7 @@ namespace Kurisu.GOAP
         }
         private void StartCurrentBestPlan()
         {
-            if (ActivatePlan != null && ActiveActionIndex < ActivatePlan.Count)
+            if (CanTickPlan && ActivatePlan != null && ActiveActionIndex < ActivatePlan.Count)
             {
                 ActivatePlan[ActiveActionIndex].OnDeactivate();
             }
@@ -110,7 +110,8 @@ namespace Kurisu.GOAP
             activePlan = optimalPlan;
             optimalPlan = null;
             if (LogActive) ActivePlanLog($"Starting {ActivatePlan[ActiveActionIndex].Name}");
-            ActivatePlan[ActiveActionIndex].OnActivate();
+            if (CanTickPlan)
+                ActivatePlan[ActiveActionIndex].OnActivate();
         }
         private void OnTickActivePlan()
         {
@@ -155,8 +156,8 @@ namespace Kurisu.GOAP
                     }
                 }
             }
-
-            ActivatePlan[ActiveActionIndex].OnTick();
+            if (CanTickPlan)
+                ActivatePlan[ActiveActionIndex].OnTick();
             // Goal complete
             if (ActivateGoal.ConditionsSatisfied(WorldState))
             {
@@ -175,10 +176,12 @@ namespace Kurisu.GOAP
                 {
                     // Can skip to a new action
                     if (LogActive) ActivePlanLog($"Stopping {activePlan[activeActionIndex]}");
-                    activePlan[activeActionIndex].OnDeactivate();
+                    if (CanTickPlan)
+                        activePlan[activeActionIndex].OnDeactivate();
                     activeActionIndex = i;
                     if (LogActive) ActivePlanLog($"Moving to new action: {activePlan[activeActionIndex]}");
-                    activePlan[activeActionIndex].OnActivate();
+                    if (CanTickPlan)
+                        activePlan[activeActionIndex].OnActivate();
                     return true;
                 }
             }
@@ -187,7 +190,8 @@ namespace Kurisu.GOAP
         private void OnCompleteOrFailActivePlan()
         {
             bool needNotify = ActivateGoal != null;
-            ActivatePlan?[ActiveActionIndex].OnDeactivate();
+            if (CanTickPlan)
+                ActivatePlan?[ActiveActionIndex].OnDeactivate();
             ActivateGoal?.OnDeactivate();
             ActivateGoal = null;
             poolQueue.Push(ActivatePlan);
@@ -355,7 +359,7 @@ namespace Kurisu.GOAP
                 closedList.Add(currentNode);
                 openList.Clear();
                 //If currentNode can satisfy state cache (which is managed backward through finding) then return the path
-                if (WorldState.IsSubset(copy.ToDictionary()))
+                if (WorldState.IsSubset(copy))
                 {
                     //Pool duplicated version
                     copy.Pooled();
@@ -499,13 +503,15 @@ namespace Kurisu.GOAP
         }
         public override void AbortActivePlan()
         {
-            ActivatePlan?[ActiveActionIndex].OnDeactivate();
+            if (CanTickPlan)
+                ActivatePlan?[ActiveActionIndex].OnDeactivate();
             poolQueue.Push(ActivatePlan);
             activePlan = null;
         }
         public override void CleanUp()
         {
-            ActivatePlan?[ActiveActionIndex].OnDeactivate();
+            if (CanTickPlan)
+                ActivatePlan?[ActiveActionIndex].OnDeactivate();
             poolQueue.Push(ActivatePlan);
             activePlan = null;
             ActivateGoal?.OnDeactivate();

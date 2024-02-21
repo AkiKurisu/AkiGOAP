@@ -157,12 +157,14 @@ namespace Kurisu.GOAP
         }
         private void StartCurrentBestPlan()
         {
-            ActivateAction?.OnDeactivate();
+            if (CanTickPlan)
+                ActivateAction?.OnDeactivate();
             activeActionIndex = 0;
             ActivatePlan.Clear();
             ActivatePlan.AddRange(candidatePlan);
             if (LogActive) ActivePlanLog($"Starting {ActivateAction.Name}");
-            ActivateAction.OnActivate();
+            if (CanTickPlan)
+                ActivateAction.OnActivate();
         }
         private void OnTickActivePlan()
         {
@@ -206,7 +208,8 @@ namespace Kurisu.GOAP
                     }
                 }
             }
-            ActivateAction.OnTick();
+            if (CanTickPlan)
+                ActivateAction.OnTick();
             // Goal complete
             if (ActivateGoal.ConditionsSatisfied(WorldState))
             {
@@ -224,10 +227,12 @@ namespace Kurisu.GOAP
                 {
                     // Can skip to a new action
                     if (LogActive) ActivePlanLog($"Stopping {ActivatePlan[activeActionIndex]}");
-                    ActivatePlan[activeActionIndex].OnDeactivate();
+                    if (CanTickPlan)
+                        ActivatePlan[activeActionIndex].OnDeactivate();
                     activeActionIndex = i;
                     if (LogActive) ActivePlanLog($"Moving to new action: {ActivatePlan[activeActionIndex]}");
-                    ActivatePlan[activeActionIndex].OnActivate();
+                    if (CanTickPlan)
+                        ActivatePlan[activeActionIndex].OnActivate();
                     return true;
                 }
             }
@@ -252,7 +257,8 @@ namespace Kurisu.GOAP
         }
         private void OnCompleteOrFailActivePlan()
         {
-            ActivateAction?.OnDeactivate();
+            if (CanTickPlan)
+                ActivateAction?.OnDeactivate();
             ActivateGoal?.OnDeactivate();
             bool needNotify = ActivateGoal != null;
             ActivateGoal = null;
@@ -262,13 +268,15 @@ namespace Kurisu.GOAP
         }
         public override void AbortActivePlan()
         {
-            ActivateAction?.OnDeactivate();
+            if (CanTickPlan)
+                ActivateAction?.OnDeactivate();
             ActivatePlan.Clear();
             activeActionIndex = 0;
         }
         public override void CleanUp()
         {
-            ActivateAction?.OnDeactivate();
+            if (CanTickPlan)
+                ActivateAction?.OnDeactivate();
             ActivatePlan.Clear();
             activeActionIndex = 0;
             ActivateGoal?.OnDeactivate();

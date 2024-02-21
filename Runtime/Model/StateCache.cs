@@ -1,10 +1,11 @@
+using System.Collections;
 using System.Collections.Generic;
 namespace Kurisu.GOAP
 {
     /// <summary>
     /// State cache for path-finding
     /// </summary>
-    public class StateCache
+    public class StateCache : IStateCollection, IEnumerable<KeyValuePair<string, bool>>
     {
         private bool isPooled;
         private static readonly ObjectPool<StateCache> pool = new(() => new(), 5);
@@ -18,7 +19,7 @@ namespace Kurisu.GOAP
         /// </summary>
         /// <param name="effects"></param>
         /// <returns></returns>
-        public StateCache DeleteIntersection(IDictionary<string, bool> effects)
+        public StateCache DeleteIntersection(IEnumerable<KeyValuePair<string, bool>> effects)
         {
             foreach (var state in effects)
             {
@@ -32,7 +33,7 @@ namespace Kurisu.GOAP
         /// </summary>
         /// <param name="otherStates"></param>
         /// <returns></returns>
-        public bool TryJoin(IDictionary<string, bool> otherStates)
+        public bool TryJoin(IEnumerable<KeyValuePair<string, bool>> otherStates)
         {
             foreach (var state in otherStates)
             {
@@ -48,7 +49,7 @@ namespace Kurisu.GOAP
         {
             return Get(oldCache.states);
         }
-        public static StateCache Get(IDictionary<string, bool> states)
+        public static StateCache Get(IEnumerable<KeyValuePair<string, bool>> states)
         {
             var cache = pool.Get();
             cache.Clear();
@@ -59,6 +60,33 @@ namespace Kurisu.GOAP
             cache.isPooled = false;
             return cache;
         }
+        public bool IsSubset(IEnumerable<KeyValuePair<string, bool>> state)
+        {
+            foreach (var i in state)
+            {
+                if (!InSet(i.Key, i.Value))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        public bool InStates(string name)
+        {
+            return states.ContainsKey(name);
+        }
+        public bool InSet(string name, bool value)
+        {
+            if (!InStates(name))
+            {
+                return value == false;
+            }
+            if (states[name] != value)
+            {
+                return false;
+            }
+            return true;
+        }
         public void Pooled()
         {
             if (isPooled) return;
@@ -68,6 +96,16 @@ namespace Kurisu.GOAP
         public Dictionary<string, bool> ToDictionary()
         {
             return states;
+        }
+
+        public IEnumerator<KeyValuePair<string, bool>> GetEnumerator()
+        {
+            return states.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return states.GetEnumerator();
         }
     }
 }
