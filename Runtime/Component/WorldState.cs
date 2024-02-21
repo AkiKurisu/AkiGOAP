@@ -9,7 +9,7 @@ namespace Kurisu.GOAP
     //  The local StateSet is specific to the GameObject, whereas the global StateSet
     //  can be shared between GameObjects.
     /// </summary>
-    public class WorldState : MonoBehaviour
+    public class WorldState : MonoBehaviour, IStateCollection
     {
         //Attached and specific to the GameObject 
         private GOAPStateSet localState;
@@ -49,7 +49,7 @@ namespace Kurisu.GOAP
             //Since we create instance manually, we need to init it
             localState.Init();
         }
-        public bool IsSubset(Dictionary<string, bool> state)
+        public bool IsSubset(IEnumerable<KeyValuePair<string, bool>> state)
         {
             foreach (var i in state)
             {

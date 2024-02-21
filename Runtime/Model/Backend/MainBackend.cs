@@ -359,7 +359,7 @@ namespace Kurisu.GOAP
                 closedList.Add(currentNode);
                 openList.Clear();
                 //If currentNode can satisfy state cache (which is managed backward through finding) then return the path
-                if (WorldState.IsSubset(copy.ToDictionary()))
+                if (WorldState.IsSubset(copy))
                 {
                     //Pool duplicated version
                     copy.Pooled();
