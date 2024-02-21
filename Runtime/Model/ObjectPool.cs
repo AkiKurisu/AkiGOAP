@@ -19,7 +19,8 @@ namespace Kurisu.GOAP
         internal readonly Queue<T> poolQueue;
         public void Push(T obj)
         {
-            poolQueue.Enqueue(obj);
+            if (obj != null)
+                poolQueue.Enqueue(obj);
         }
         public T Get()
         {
