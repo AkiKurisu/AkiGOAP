@@ -106,7 +106,7 @@ namespace Kurisu.GOAP
                 ActivatePlan[ActiveActionIndex].OnDeactivate();
             }
             activeActionIndex = 0;
-            if (ActivatePlan != null) poolQueue.Push(ActivatePlan);
+            poolQueue.Push(ActivatePlan);
             activePlan = optimalPlan;
             optimalPlan = null;
             if (LogActive) ActivePlanLog($"Starting {ActivatePlan[ActiveActionIndex].Name}");
@@ -517,8 +517,7 @@ namespace Kurisu.GOAP
             ActivateGoal?.OnDeactivate();
             ActivateGoal = null;
             optimalGoal = null;
-            if (optimalPlan != null)
-                poolQueue.Push(optimalPlan);
+            poolQueue.Push(optimalPlan);
             optimalPlan = null;
         }
     }
